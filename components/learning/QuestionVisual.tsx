@@ -162,9 +162,21 @@ function Ribbon({ label, value, max, scaffold, className }: { label: string; val
   );
 }
 
-function Coin({ value }: { value: number }) {
+function MoneyPiece({ value }: { value: number }) {
   const dollars = value >= 100;
   const label = dollars ? `${value / 100}` : `${value}c`;
+
+  if (value >= 500) {
+    return (
+      <div className="coinItem">
+        <div className={value === 500 ? "note fiveNote" : "note tenNote"} aria-hidden="true">
+          <span>{label}</span>
+        </div>
+        <strong>{label}</strong>
+      </div>
+    );
+  }
+
   const gold = value === 100 || value === 200;
   return (
     <div className="coinItem">
