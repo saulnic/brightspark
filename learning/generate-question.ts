@@ -79,7 +79,7 @@ function makeQuestion(
     correctChoiceId: correct.id,
     explanation,
     seed,
-    contentVersion: "1.1",
+    contentVersion: "1.2",
   };
 }
 
@@ -110,10 +110,10 @@ const READING = [
 ];
 
 const GRAMMAR = [
-  { q: "Which sentence ends correctly?", a: "We went to the park.", d: ["We went to the park","we went to the park.","We went to the park,"] },
+  { q: "Which sentence has the correct ending punctuation?", a: "We went to the park.", d: ["We went to the park","We went to the park,","We went to the park?"] },
   { q: "Which word is a noun?", a: "dog", d: ["quickly","blue","jumped"] },
   { q: "Which word is a verb?", a: "runs", d: ["happy","table","green"] },
-  { q: "Which sentence starts correctly?", a: "My cat is sleepy.", d: ["my cat is sleepy.","MY cat is sleepy.","my Cat is sleepy."] },
+  { q: "Which sentence uses capital letters correctly?", a: "My cat is sleepy.", d: ["my cat is sleepy.","MY cat is sleepy.","my Cat is sleepy."] },
   { q: "Which word is an adjective?", a: "tiny", d: ["jump","slowly","chair"] },
   { q: "Which sentence needs a question mark?", a: "Where is my hat?", d: ["I found my hat.","Put on your hat.","My hat is blue."] },
   { q: "Choose the sentence with the correct capital letter.", a: "Brisbane is in Queensland.", d: ["brisbane is in Queensland.","Brisbane is in queensland.","brisbane is in queensland."] },
@@ -140,7 +140,11 @@ const VOCAB = [
 ];
 
 function money(v: number) {
-  return v < 100 ? `${v}c` : `$${(v / 100).toFixed(v % 100 === 0 ? 0 : 2)}`;
+  return v < 100 ? `${v}c` : `${(v / 100).toFixed(v % 100 === 0 ? 0 : 2)}`;
+}
+
+function countLabel(count: number, singular: string, plural = singular + "s") {
+  return `${count} ${count === 1 ? singular : plural}`;
 }
 
 export function generateQuestion(skillId: string, stage: number, seed: number): LearningQuestion {
@@ -152,12 +156,17 @@ export function generateQuestion(skillId: string, stage: number, seed: number): 
     const mode = int(rng, 0, difficulty > 2 ? 2 : 1);
 
     if (mode === 0) {
-      const a = int(rng, 1, max);
-      let b = int(rng, 1, max);
-      if (a === b) b = b === max ? b - 1 : b + 1;
+      const values = new Set<number>();
+      while (values.size < 4) values.add(int(rng, 1, max));
+      const displayed = [...values];
       const larger = rng() > 0.5;
-      const correct = larger ? Math.max(a, b) : Math.min(a, b);
-      return makeQuestion("numbers", larger ? "compare.larger" : "compare.smaller", difficulty, "number_compare", `Which number is ${larger ? "larger" : "smaller"}?`, textChoices(rng, String(correct), [String(a === correct ? b : a), String(correct + 1), String(Math.max(0, correct - 1))]), String(correct), seed);
+      const correct = larger ? Math.max(...displayed) : Math.min(...displayed);
+      const choices = shuffle(rng, displayed).map((value, index) => ({
+        id: "c" + index,
+        label: String(value),
+        value: String(value),
+      }));
+      return makeQuestion("numbers", larger ? "compare.larger" : "compare.smaller", difficulty, "number_compare", `Which number is ${larger ? "larger" : "smaller"}?`, choices, String(correct), seed);
     }
 
     if (mode === 1) {
@@ -244,7 +253,7 @@ export function generateQuestion(skillId: string, stage: number, seed: number): 
   if (skillId === "time") {
     const hour = int(rng, 1, 12);
 
-    if (difficulty > 2 && rng() < 0.4) {
+    if (difficulty > 3 && rng() < 0.2) {
       const minutes = pick(rng, [15,30,45,60]);
       const startMinutes = hour * 60;
       const finishMinutes = startMinutes + minutes;
@@ -254,10 +263,16 @@ export function generateQuestion(skillId: string, stage: number, seed: number): 
       return makeQuestion("time", "time.duration", difficulty, "time_duration", `A game starts at ${hour}:00 and lasts ${minutes} minutes. When does it finish?`, textChoices(rng, correct, [`${hour}:30`, `${hour}:15`, `${hour === 12 ? 1 : hour + 1}:00`]), correct, seed);
     }
 
-    const half = difficulty > 1 && rng() > 0.45;
-    const correct = half ? `${hour}:30` : `${hour}:00`;
-    const distractors = half ? [`${hour}:00`, `${hour === 12 ? 1 : hour + 1}:30`, `${hour}:15`] : [`${hour}:30`, `${hour === 12 ? 1 : hour + 1}:00`, `${hour}:15`];
-    return makeQuestion("time", half ? "time.half_hour" : "time.hour", difficulty, "time_read", `Which digital time shows ${half ? "half past " : ""}${hour}${half ? "" : " o'clock"}?`, textChoices(rng, correct, distractors), correct, seed);
+    const minuteOptions = difficulty === 1 ? [0] : difficulty < 4 ? [0,30] : [0,15,30,45];
+    const minute = pick(rng, minuteOptions);
+    const correct = `${hour}:${String(minute).padStart(2, "0")}`;
+    const wrongHour = hour === 12 ? 1 : hour + 1;
+    const distractors = [
+      `${hour}:${String((minute + 30) % 60).padStart(2, "0")}`,
+      `${wrongHour}:${String(minute).padStart(2, "0")}`,
+      `${hour}:${String((minute + 15) % 60).padStart(2, "0")}`,
+    ];
+    return makeQuestion("time", "time.analog_read", difficulty, "analog_clock", "What time does the clock show?", textChoices(rng, correct, distractors), correct, seed, undefined, { hour, minute });
   }
 
   if (skillId === "measure") {
@@ -269,7 +284,7 @@ export function generateQuestion(skillId: string, stage: number, seed: number): 
       if (blue === yellow) blue += 5;
       const askLonger = rng() > 0.5;
       const correct = askLonger ? (yellow > blue ? "Yellow ribbon" : "Blue ribbon") : (yellow < blue ? "Yellow ribbon" : "Blue ribbon");
-      return makeQuestion("measure", "measure.length.compare", difficulty, "measurement_compare", `The yellow ribbon is ${yellow} cm. The blue ribbon is ${blue} cm. Which is ${askLonger ? "longer" : "shorter"}?`, textChoices(rng, correct, [correct === "Yellow ribbon" ? "Blue ribbon" : "Yellow ribbon", "They are equal"]), correct, seed);
+      return makeQuestion("measure", "measure.length.compare", difficulty, "measurement_compare", `Which ribbon is ${askLonger ? "longer" : "shorter"}?`, textChoices(rng, correct, [correct === "Yellow ribbon" ? "Blue ribbon" : "Yellow ribbon", "They are equal"]), correct, seed, undefined, { kind: "ribbons", yellow, blue, unit: "cm" });
     }
 
     if (mode === 1) {
@@ -277,14 +292,14 @@ export function generateQuestion(skillId: string, stage: number, seed: number): 
       let green = int(rng, 1, 9) * 100;
       if (green === red) green += 100;
       const correct = red > green ? "Red jug" : "Green jug";
-      return makeQuestion("measure", "measure.capacity.compare", difficulty, "capacity_compare", `The red jug holds ${red} mL. The green jug holds ${green} mL. Which holds more?`, textChoices(rng, correct, [correct === "Red jug" ? "Green jug" : "Red jug", "They hold the same"]), correct, seed);
+      return makeQuestion("measure", "measure.capacity.compare", difficulty, "capacity_compare", "Which jug holds more?", textChoices(rng, correct, [correct === "Red jug" ? "Green jug" : "Red jug", "They hold the same"]), correct, seed, undefined, { kind: "jugs", red, green, unit: "mL" });
     }
 
     const apple = int(rng, 80, 250);
     let orange = int(rng, 80, 250);
     if (orange === apple) orange += 10;
     const correct = apple > orange ? "Apple" : "Orange";
-    return makeQuestion("measure", "measure.mass.compare", difficulty, "mass_compare", `The apple weighs ${apple} g. The orange weighs ${orange} g. Which is heavier?`, textChoices(rng, correct, [correct === "Apple" ? "Orange" : "Apple", "They weigh the same"]), correct, seed);
+    return makeQuestion("measure", "measure.mass.compare", difficulty, "mass_compare", "Which is heavier?", textChoices(rng, correct, [correct === "Apple" ? "Orange" : "Apple", "They weigh the same"]), correct, seed, undefined, { kind: "mass", apple, orange, unit: "g" });
   }
 
   if (skillId === "shapes") {
@@ -308,7 +323,7 @@ export function generateQuestion(skillId: string, stage: number, seed: number): 
     const target = pick(rng, twoD);
     const askCorners = rng() > 0.5;
     const count = askCorners ? target.corners : target.sides;
-    return makeQuestion("shapes", askCorners ? "shapes.corners" : "shapes.sides", difficulty, "shape_properties", `Which shape has ${count} ${askCorners ? "corners" : "sides"}?`, textChoices(rng, target.name, twoD.filter((i) => i.name !== target.name).map((i) => i.name)), target.name, seed);
+    return makeQuestion("shapes", askCorners ? "shapes.corners" : "shapes.sides", difficulty, "shape_properties", `Which shape has ${count} ${askCorners ? "corners" : "sides"}?`, textChoices(rng, target.name, twoD.filter((i) => i.name !== target.name).map((i) => i.name)), target.name, seed, undefined, { kind: "shape_choices" });
   }
 
   if (skillId === "patterns") {
@@ -319,8 +334,8 @@ export function generateQuestion(skillId: string, stage: number, seed: number): 
       return makeQuestion("patterns", "patterns.visual", difficulty, "visual_pattern", `What comes next?  ${a} ${b} ${a} ${b} __`, textChoices(rng, correct, [b,"🔶","⚫"]), correct, seed);
     }
 
-    const start = int(rng, 1, 10);
-    const step = pick(rng, difficulty < 3 ? [1,2,5] : [2,3,4,5,10]);
+    const start = int(rng, 1, difficulty === 1 ? 6 : 10);
+    const step = difficulty === 1 ? pick(rng, [1,2]) : difficulty === 2 ? pick(rng, [1,2,3]) : difficulty < 5 ? pick(rng, [2,3,4,5]) : pick(rng, [2,3,4,5,10]);
     const seq = [start, start + step, start + step * 2, start + step * 3];
     const correct = start + step * 4;
     return makeQuestion("patterns", "patterns.number", difficulty, "number_pattern", `What comes next?  ${seq.join(", ")}, …`, numericChoices(rng, correct, Math.max(3, step + 2)), correct, seed);
@@ -341,19 +356,19 @@ export function generateQuestion(skillId: string, stage: number, seed: number): 
     let prompt: string;
     let correct: string;
     if (red === 0) {
-      prompt = `A bag has ${blue} blue counters and no red counters. What is the chance of picking red?`;
+      prompt = `A bag has ${countLabel(blue, "blue counter")} and no red counters. What is the chance of picking red?`;
       correct = "Impossible";
     } else if (blue === 0) {
-      prompt = `A bag has ${red} red counters and no blue counters. What is the chance of picking red?`;
+      prompt = `A bag has ${countLabel(red, "red counter")} and no blue counters. What is the chance of picking red?`;
       correct = "Certain";
     } else if (red === blue) {
-      prompt = `A bag has ${red} red and ${blue} blue counters. Which colour is more likely to be picked?`;
+      prompt = `A bag has ${countLabel(red, "red counter")} and ${countLabel(blue, "blue counter")}. Which colour is more likely to be picked?`;
       correct = "Equally likely";
     } else {
       prompt = `A bag has ${red} red and ${blue} blue counters. Which colour is more likely to be picked?`;
       correct = red > blue ? "Red" : "Blue";
     }
-    return makeQuestion("data", "chance.counters", difficulty, "counter_probability", prompt, textChoices(rng, correct, ["Red","Blue","Equally likely","Impossible","Certain"]), correct, seed, undefined, { red, blue });
+    return makeQuestion("data", "chance.counters", difficulty, "counter_probability", prompt, textChoices(rng, correct, ["Red","Blue","Equally likely","Impossible","Certain"]), correct, seed, undefined, { kind: "counters", red, blue });
   }
 
   if (skillId === "spelling") {

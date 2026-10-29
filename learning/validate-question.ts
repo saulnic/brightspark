@@ -60,5 +60,25 @@ export function validateQuestion(
     errors.push("Content version is required.");
   }
 
+  if (question.questionType === "number_compare") {
+    const values = question.choices.map((choice) => Number(choice.value));
+    const correct = Number(
+      question.choices.find((choice) => choice.id === question.correctChoiceId)?.value
+    );
+    const asksLarger = question.prompt.toLowerCase().includes("larger");
+    const expected = asksLarger ? Math.max(...values) : Math.min(...values);
+    if (!Number.isFinite(correct) || correct !== expected) {
+      errors.push("Number comparison answer must match the displayed extrema.");
+    }
+  }
+
+  if (question.skillId === "patterns" && question.difficulty === 1 && question.questionType === "number_pattern") {
+    const numbers = question.prompt.match(/\d+/g)?.map(Number) ?? [];
+    if (numbers.length >= 2) {
+      const step = numbers[1] - numbers[0];
+      if (![1, 2].includes(step)) errors.push("Stage 1 number patterns may only use +1 or +2.");
+    }
+  }
+
   return errors.length ? { valid: false, errors } : { valid: true };
 }

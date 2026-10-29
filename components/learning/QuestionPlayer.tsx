@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/client";
 import { generateQuestion } from "@/learning/generate-question";
 import { validateQuestion } from "@/learning/validate-question";
 import type { LearningQuestion } from "@/learning/types";
+import { ChoiceVisual, QuestionVisual } from "./QuestionVisual";
 
 const ROUND_SIZE = 5;
 
@@ -83,9 +84,9 @@ export function QuestionPlayer({
       durationMs: Date.now() - startedAt,
     };
     const nextAnswers = [...answers, attempt];
-    setAnswers(nextAnswers);
 
     if (index < ROUND_SIZE - 1) {
+      setAnswers(nextAnswers);
       setIndex(index + 1);
       setSelected(null);
       setStartedAt(Date.now());
@@ -147,6 +148,7 @@ export function QuestionPlayer({
 
       setStage(nextStage);
       setXp(nextXp);
+      setAnswers(nextAnswers);
       emitFeedback("complete");
     } finally {
       setSaving(false);
@@ -190,8 +192,9 @@ export function QuestionPlayer({
       <div className="progressTrack"><div style={{ width: `${((index + 1) / ROUND_SIZE) * 100}%` }} /></div>
 
       <section className="questionCard">
+        <QuestionVisual question={question} />
         <h1 className="questionPrompt">{question.prompt}</h1>
-        <div className="answerGrid">
+        <div className={`answerGrid choices-${question.choices.length}`}>
           {question.choices.map((choice) => {
             const isSelected = selected === choice.id;
             const isCorrect = selected && choice.id === question.correctChoiceId;
@@ -203,7 +206,7 @@ export function QuestionPlayer({
                 onClick={() => choose(choice.id)}
                 disabled={Boolean(selected)}
               >
-                {choice.label}
+                <ChoiceVisual question={question} choice={choice} />
               </button>
             );
           })}
