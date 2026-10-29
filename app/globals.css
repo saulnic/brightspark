@@ -62,8 +62,6 @@ small { color:#77718a; }
 .learningHero h1 { font-size:1.85rem; margin-bottom:4px; }
 .learningHero p { margin-bottom:0; }
 .starPill { padding:9px 12px; border-radius:999px; background:#fff7d6; font-weight:800; white-space:nowrap; }
-.utilityRow { display:flex; gap:9px; margin-bottom:18px; }
-.utilityRow a { flex:1; text-align:center; padding:10px 12px; border-radius:15px; background:#ece7ff; color:#5544b9; font-weight:800; font-size:.88rem; }
 
 .subjectSection { margin:22px 0 28px; }
 .subjectHeading { display:flex; align-items:center; justify-content:space-between; margin:0 4px 10px; }
@@ -163,6 +161,23 @@ small { color:#77718a; }
 .optionChip { border:2px solid #e5e1ee; background:white; border-radius:999px; padding:8px 11px; font-weight:700; color:#5d586b; }
 .optionChip.selected { border-color:#725ed3; background:#eee9ff; color:#5140af; }
 .avatarSave { margin-top:4px; }
+.avatarActions { display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+.rewardsHero { background:white; box-shadow:0 14px 38px rgba(37,36,58,.08); border-radius:25px; padding:18px; display:flex; align-items:center; gap:18px; margin-bottom:14px; }
+.rewardsHero h1 { font-size:1.8rem; margin-bottom:7px; }
+.rewardsHero p { margin-bottom:8px; }
+.rewardStars { display:inline-block; padding:8px 11px; border-radius:999px; background:#fff7d6; font-weight:800; }
+.rewardGrid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:11px; }
+.rewardCard { background:white; border:2px solid #e7e0ff; border-radius:20px; padding:14px; display:grid; grid-template-columns:auto 1fr; gap:10px 12px; align-items:center; box-shadow:0 10px 28px rgba(37,36,58,.06); }
+.rewardCard.locked { opacity:.62; border-style:dashed; }
+.rewardIcon { width:52px; height:52px; border-radius:16px; display:grid; place-items:center; background:#f4f0ff; font-size:1.8rem; }
+.rewardCopy { display:grid; gap:3px; min-width:0; }
+.rewardCopy strong { font-size:.98rem; }
+.rewardCopy span { font-size:.77rem; color:#747284; line-height:1.3; }
+.rewardCopy small { font-size:.7rem; font-weight:800; color:#6f5bd3; }
+.rewardCard form { grid-column:1 / -1; }
+.rewardButton { width:100%; border:0; border-radius:12px; padding:10px 12px; font-weight:800; color:#fff; background:#6f5bd3; }
+.rewardButton.equipped { background:#dff4e4; color:#347646; }
+.rewardButton:disabled { opacity:.7; }
 
 .statsGrid { display:grid; grid-template-columns:repeat(4,1fr); gap:9px; margin-bottom:12px; }
 .statCard { border-radius:18px; padding:14px; display:grid; gap:2px; }
@@ -209,4 +224,7 @@ small { color:#77718a; }
   .avatarPreview { gap:14px; }
   .avatarPreview .avatarSvg { width:112px; height:112px; }
   .statsGrid { grid-template-columns:repeat(2,1fr); }
+  .rewardsHero { align-items:flex-start; }
+  .rewardsHero .avatarSvg { width:82px; height:82px; }
+  .rewardGrid { grid-template-columns:1fr; }
 }

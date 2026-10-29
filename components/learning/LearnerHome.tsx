@@ -18,6 +18,7 @@ export function LearnerHome({
   progress: Progress[];
 }) {
   const bySkill = new Map(progress.map((p) => [p.skill_id, p]));
+  const stars = progress.reduce((sum, p) => sum + (Math.max(1, p.stage) - 1) * 30 + p.xp, 0);
 
   return (
     <>
@@ -30,13 +31,8 @@ export function LearnerHome({
             <p className="muted">Pick something that looks fun.</p>
           </div>
         </div>
-        <div className="starPill">⭐ {progress.reduce((sum, p) => sum + p.xp, 0)}</div>
+        <a className="starPill" href={`/learn/${learnerId}/rewards`} aria-label="Open rewards collection">⭐ {stars}</a>
       </section>
-
-      <nav className="utilityRow" aria-label="Learner tools">
-        <a href={`/learn/${learnerId}/progress`}>📊 Progress</a>
-        <a href={`/learn/${learnerId}/avatar`}>🎨 Avatar</a>
-      </nav>
 
       {(["maths", "english"] as const).map((subject) => (
         <section className="subjectSection" key={subject}>

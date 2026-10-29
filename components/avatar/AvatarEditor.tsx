@@ -18,6 +18,7 @@ const LABELS: Record<string, string> = {
   dark: "Dark",
   short: "Short",
   bob: "Bob",
+  long: "Long",
   curls: "Curls",
   topknot: "Top knot",
   black: "Black",
@@ -66,7 +67,10 @@ export function AvatarEditor({
         <AvatarOption title="Hair colour" values={AVATAR_OPTIONS.hairColour} selected={config.hairColour} onPick={(value) => set("hairColour", value)} />
         <AvatarOption title="Accessory" values={AVATAR_OPTIONS.accessory} selected={config.accessory} onPick={(value) => set("accessory", value)} />
 
-        <button className="primaryButton avatarSave">Save avatar</button>
+        <div className="avatarActions">
+          <button className="primaryButton avatarSave">Save avatar</button>
+          <a className="secondaryButton" href={`/learn/${learnerId}/rewards`}>🎁 Rewards</a>
+        </div>
       </form>
     </section>
   );

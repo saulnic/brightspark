@@ -79,7 +79,7 @@ function makeQuestion(
     correctChoiceId: correct.id,
     explanation,
     seed,
-    contentVersion: "1.3",
+    contentVersion: "1.4",
   };
 }
 
@@ -415,22 +415,39 @@ export function generateQuestion(skillId: string, stage: number, seed: number): 
     const blue = int(rng, 0, 5);
     if (red + blue === 0) return generateQuestion(skillId, stage, seed + 1);
 
-    let prompt: string;
-    let correct: string;
-    if (red === 0) {
-      prompt = `A bag has ${countLabel(blue, "blue counter")} and no red counters. What is the chance of picking red?`;
-      correct = "Impossible";
-    } else if (blue === 0) {
-      prompt = `A bag has ${countLabel(red, "red counter")} and no blue counters. What is the chance of picking red?`;
-      correct = "Certain";
-    } else if (red === blue) {
-      prompt = `A bag has ${countLabel(red, "red counter")} and ${countLabel(blue, "blue counter")}. Which colour is more likely to be picked?`;
-      correct = "Equally likely";
-    } else {
-      prompt = `A bag has ${countLabel(red, "red counter")} and ${countLabel(blue, "blue counter")}. Which colour is more likely to be picked?`;
-      correct = red > blue ? "Red" : "Blue";
+    if (red === 0 || blue === 0) {
+      const correct = red === 0 ? "Impossible" : "Certain";
+      const prompt = red === 0
+        ? `A bag has ${countLabel(blue, "blue counter")} and no red counters. What is the chance of picking red?`
+        : `A bag has ${countLabel(red, "red counter")} and no blue counters. What is the chance of picking red?`;
+      return makeQuestion(
+        "data",
+        "chance.red_probability",
+        difficulty,
+        "counter_probability_chance",
+        prompt,
+        textChoices(rng, correct, ["Impossible","Unlikely","Equally likely","Likely","Certain"]),
+        correct,
+        seed,
+        undefined,
+        { kind: "counters", red, blue }
+      );
     }
-    return makeQuestion("data", "chance.counters", difficulty, "counter_probability", prompt, textChoices(rng, correct, ["Red","Blue","Equally likely","Impossible","Certain"]), correct, seed, undefined, { kind: "counters", red, blue });
+
+    const correct = red === blue ? "Equally likely" : red > blue ? "Red" : "Blue";
+    const prompt = `A bag has ${countLabel(red, "red counter")} and ${countLabel(blue, "blue counter")}. Which colour is more likely to be picked?`;
+    return makeQuestion(
+      "data",
+      "chance.colour_compare",
+      difficulty,
+      "counter_probability_compare",
+      prompt,
+      textChoices(rng, correct, ["Red","Blue","Equally likely"]),
+      correct,
+      seed,
+      undefined,
+      { kind: "counters", red, blue }
+    );
   }
 
   if (skillId === "spelling") {

@@ -72,6 +72,20 @@ export function validateQuestion(
     }
   }
 
+  if (question.questionType === "counter_probability_chance") {
+    const allowed = new Set(["Impossible","Unlikely","Equally likely","Likely","Certain"]);
+    if (question.choices.some((choice) => !allowed.has(String(choice.value)))) {
+      errors.push("Chance questions may only use probability-language answers.");
+    }
+  }
+
+  if (question.questionType === "counter_probability_compare") {
+    const allowed = new Set(["Red","Blue","Equally likely"]);
+    if (question.choices.some((choice) => !allowed.has(String(choice.value)))) {
+      errors.push("Colour comparison questions may only use colour-comparison answers.");
+    }
+  }
+
   if (question.skillId === "patterns" && question.difficulty === 1 && question.questionType === "number_pattern") {
     const numbers = question.prompt.match(/\d+/g)?.map(Number) ?? [];
     if (numbers.length >= 2) {
