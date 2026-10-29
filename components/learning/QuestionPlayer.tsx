@@ -38,12 +38,14 @@ export function QuestionPlayer({
   skillName,
   initialStage,
   initialXp,
+  bonusRewardId,
 }: {
   learnerId: string;
   skillId: string;
   skillName: string;
   initialStage: number;
   initialXp: number;
+  bonusRewardId?: string;
 }) {
   const [roundKey, setRoundKey] = useState(0);
   const [seeds, setSeeds] = useState(seedsForRound);
@@ -55,6 +57,7 @@ export function QuestionPlayer({
   const [done, setDone] = useState(false);
   const [stage, setStage] = useState(initialStage);
   const [xp, setXp] = useState(initialXp);
+  const [bonusUnlocked, setBonusUnlocked] = useState(false);
 
   const question = useMemo(() => {
     const used = new Set(answers.map((answer) => conceptSignature(answer.question)));
@@ -146,6 +149,16 @@ export function QuestionPlayer({
         last_practised_at: new Date().toISOString(),
       });
 
+      if (bonusRewardId && correct >= 4) {
+        const { error: rewardError } = await supabase.from("learner_rewards").upsert({
+          learner_id: learnerId,
+          reward_id: bonusRewardId,
+          source: "avoided_skill_challenge",
+          metadata: { skill_id: skillId, score: correct, question_count: ROUND_SIZE },
+        });
+        if (!rewardError) setBonusUnlocked(true);
+      }
+
       setStage(nextStage);
       setXp(nextXp);
       setAnswers(nextAnswers);
@@ -173,6 +186,7 @@ export function QuestionPlayer({
         <div className="finishEmoji">{score >= 4 ? "🌟" : score >= 3 ? "👏" : "💪"}</div>
         <h1>{score}/5 correct</h1>
         <p>{score === 5 ? "Perfect round!" : score >= 3 ? "Nice work!" : "Good practice — every round helps."}</p>
+        {bonusUnlocked ? <div className="bonusUnlocked">🕶️ Bonus sunglasses unlocked!</div> : null}
         <div className="roundProgress">Stage {stage} · {xp}/30 XP</div>
         <div className="finishActions">
           <button className="primaryButton" onClick={playAgain}>Play again</button>

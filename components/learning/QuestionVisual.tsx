@@ -151,13 +151,11 @@ function Jug({ colour, value, unit }: { colour: "red" | "green"; value: number; 
   );
 }
 
-function Ribbon({ label, value, max, scaffold, className }: { label: string; value: number; max: number; scaffold: number; className: string }) {
-  const proportional = Math.max(35, (value / max) * 68);
-  const width = scaffold <= 1 ? proportional : scaffold === 2 ? 56 + (value / max) * 12 : 64;
+function Ribbon({ label, value, className }: { label: string; value: number; max: number; scaffold: number; className: string }) {
   return (
     <div className="ribbonRow">
       <div><strong>{label}</strong><span>{value} cm</span></div>
-      <div className={`ribbonBar ${className}`} style={{ width: `${width}%` }} />
+      <div className={`ribbonBar ${className}`} style={{ width: "64%" }} />
     </div>
   );
 }

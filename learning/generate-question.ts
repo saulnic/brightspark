@@ -79,7 +79,7 @@ function makeQuestion(
     correctChoiceId: correct.id,
     explanation,
     seed,
-    contentVersion: "1.4",
+    contentVersion: "1.5",
   };
 }
 
