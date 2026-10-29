@@ -1,6 +1,6 @@
 export type SkillMeta = {
   id: string;
-  subject: "maths" | "english";
+  subject: "maths" | "english" | "science";
   name: string;
   icon: string;
   description: string;
@@ -17,21 +17,20 @@ export const SKILLS: SkillMeta[] = [
   { id: "shapes", subject: "maths", name: "Shapes & space", icon: "🔷", description: "2D shapes, 3D objects and position" },
   { id: "patterns", subject: "maths", name: "Patterns", icon: "🟣", description: "Spot and continue patterns" },
   { id: "data", subject: "maths", name: "Data & chance", icon: "🎲", description: "Graphs and simple probability" },
+
   { id: "spelling", subject: "english", name: "Spelling", icon: "✏️", description: "Build spelling confidence" },
   { id: "reading", subject: "english", name: "Reading", icon: "📚", description: "Short comprehension questions" },
   { id: "grammar", subject: "english", name: "Grammar", icon: "🧩", description: "Sentences, punctuation and word types" },
   { id: "vocab", subject: "english", name: "Vocabulary", icon: "💬", description: "Word meanings and synonyms" },
+
+  { id: "solar", subject: "science", name: "Solar system", icon: "🪐", description: "Sun, Moon, planets and space" },
+  { id: "volcanoes", subject: "science", name: "Volcanoes", icon: "🌋", description: "Magma, lava, eruptions and Earth" },
+  { id: "dinosaurs", subject: "science", name: "Dinosaurs & fossils", icon: "🦖", description: "Dinosaurs, fossils and deep time" },
+  { id: "habitats", subject: "science", name: "Animals & habitats", icon: "🐾", description: "Animals, adaptations and ecosystems" },
 ];
 
 export const STAGE_NAMES = [
-  "Starting",
-  "Building",
-  "Growing",
-  "Confident",
-  "Strong",
-  "Advanced",
-  "Expert",
-  "Mastering",
+  "Starting","Building","Growing","Confident","Strong","Advanced","Expert","Mastering",
 ] as const;
 
 export function getSkill(id: string) {

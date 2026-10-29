@@ -79,7 +79,7 @@ function makeQuestion(
     correctChoiceId: correct.id,
     explanation,
     seed,
-    contentVersion: "1.5",
+    contentVersion: "1.6",
   };
 }
 
@@ -139,8 +139,71 @@ const VOCAB = [
   { word: "fortunate", answer: "lucky", d: ["sleepy","empty","slow"] },
 ];
 
+
+type ScienceQuestion = {
+  min: number;
+  objective: string;
+  prompt: string;
+  answer: string;
+  distractors: string[];
+  scene: "solar" | "volcano" | "dinosaur" | "habitat";
+  detail?: string;
+};
+
+const SCIENCE_QUESTIONS: Record<string, ScienceQuestion[]> = {
+  solar: [
+    { min:1, objective:"solar.identify.sun", prompt:"Which object is the Sun?", answer:"The star in the centre", distractors:["Earth","The Moon","Saturn"], scene:"solar", detail:"sun" },
+    { min:1, objective:"solar.earth.home", prompt:"Which planet do we live on?", answer:"Earth", distractors:["Mars","Jupiter","Venus"], scene:"solar", detail:"earth" },
+    { min:1, objective:"solar.moon", prompt:"What travels around Earth?", answer:"The Moon", distractors:["The Sun","Mars","Jupiter"], scene:"solar", detail:"moon" },
+    { min:2, objective:"solar.star", prompt:"What kind of object is the Sun?", answer:"A star", distractors:["A planet","A moon","An asteroid"], scene:"solar", detail:"sun" },
+    { min:2, objective:"solar.daynight", prompt:"What causes day and night?", answer:"Earth spinning", distractors:["The Moon glowing","Clouds moving","The Sun switching off"], scene:"solar", detail:"rotation" },
+    { min:3, objective:"solar.order", prompt:"Which planet is closest to the Sun?", answer:"Mercury", distractors:["Earth","Mars","Neptune"], scene:"solar", detail:"planets" },
+    { min:3, objective:"solar.redplanet", prompt:"Which planet is often called the Red Planet?", answer:"Mars", distractors:["Venus","Saturn","Mercury"], scene:"solar", detail:"mars" },
+    { min:4, objective:"solar.orbit", prompt:"What is an orbit?", answer:"A path around another object", distractors:["A kind of star","A space rock","A planet's surface"], scene:"solar", detail:"orbit" },
+    { min:4, objective:"solar.year", prompt:"What makes one year on Earth?", answer:"Earth going once around the Sun", distractors:["Earth spinning once","The Moon going around Earth","The Sun going around Earth"], scene:"solar", detail:"orbit" },
+    { min:5, objective:"solar.gasgiant", prompt:"Which is a gas giant?", answer:"Jupiter", distractors:["Mercury","Earth","Mars"], scene:"solar", detail:"jupiter" },
+    { min:6, objective:"solar.seasons", prompt:"Why do Earth’s seasons change?", answer:"Earth is tilted as it orbits the Sun", distractors:["Earth gets much closer to the Sun","The Moon blocks sunlight","The Sun gets hotter every summer"], scene:"solar", detail:"tilt" },
+  ],
+  volcanoes: [
+    { min:1, objective:"volcano.lava", prompt:"What is melted rock called after it reaches the surface?", answer:"Lava", distractors:["Steam","Ash","Soil"], scene:"volcano", detail:"lava" },
+    { min:1, objective:"volcano.crater", prompt:"Where does lava often come out of a volcano?", answer:"The opening at the top", distractors:["The ocean","A tree","The clouds"], scene:"volcano", detail:"crater" },
+    { min:1, objective:"volcano.eruption", prompt:"What is it called when a volcano sends out lava, ash or gas?", answer:"An eruption", distractors:["An orbit","A fossil","A flood"], scene:"volcano", detail:"eruption" },
+    { min:2, objective:"volcano.magma", prompt:"What is melted rock called while it is still underground?", answer:"Magma", distractors:["Lava","Sand","Coal"], scene:"volcano", detail:"magma" },
+    { min:2, objective:"volcano.ash", prompt:"What can rise into the air during an eruption?", answer:"Ash and gas", distractors:["Icebergs","Tree roots","Moonlight"], scene:"volcano", detail:"ash" },
+    { min:3, objective:"volcano.inside", prompt:"Where is magma found before an eruption?", answer:"Below Earth's surface", distractors:["In the clouds","On the Moon","Inside trees"], scene:"volcano", detail:"magma" },
+    { min:3, objective:"volcano.vent", prompt:"What is a volcanic vent?", answer:"An opening where magma and gas can escape", distractors:["A type of dinosaur","A layer of cloud","A river mouth"], scene:"volcano", detail:"vent" },
+    { min:4, objective:"volcano.plates", prompt:"Many volcanoes form near the edges of what?", answer:"Tectonic plates", distractors:["Weather fronts","Continents' flags","Ocean waves"], scene:"volcano", detail:"plates" },
+    { min:5, objective:"volcano.rock", prompt:"What can cooled lava become?", answer:"Solid rock", distractors:["Liquid water","Cloud","Wood"], scene:"volcano", detail:"rock" },
+    { min:6, objective:"volcano.types", prompt:"Why can some eruptions be more explosive than others?", answer:"Their magma can trap more gas", distractors:["Their mountains are always taller","They are closer to the Moon","They erupt only at night"], scene:"volcano", detail:"eruption" },
+  ],
+  dinosaurs: [
+    { min:1, objective:"dino.fossil", prompt:"What is a fossil?", answer:"Evidence of ancient life preserved in rock", distractors:["A living dinosaur","A shiny new rock","A volcano"], scene:"dinosaur", detail:"fossil" },
+    { min:1, objective:"dino.herbivore", prompt:"A dinosaur that ate plants was a...", answer:"Herbivore", distractors:["Carnivore","Volcano","Planet"], scene:"dinosaur", detail:"herbivore" },
+    { min:1, objective:"dino.carnivore", prompt:"A dinosaur that ate other animals was a...", answer:"Carnivore", distractors:["Herbivore","Fossil","Mammal"], scene:"dinosaur", detail:"carnivore" },
+    { min:2, objective:"dino.scientist", prompt:"Who studies fossils and ancient life?", answer:"A palaeontologist", distractors:["An astronaut","A meteorologist","A dentist"], scene:"dinosaur", detail:"scientist" },
+    { min:2, objective:"dino.extinct", prompt:"What does extinct mean?", answer:"No members of that species are alive today", distractors:["It lives only at night","It is very large","It can fly"], scene:"dinosaur", detail:"extinct" },
+    { min:3, objective:"dino.trace", prompt:"Which could be a trace fossil?", answer:"A preserved footprint", distractors:["A fresh leaf","A plastic toy","A cloud"], scene:"dinosaur", detail:"footprint" },
+    { min:3, objective:"dino.birds", prompt:"Which living animals are the closest descendants of dinosaurs?", answer:"Birds", distractors:["Frogs","Sharks","Snails"], scene:"dinosaur", detail:"bird" },
+    { min:4, objective:"dino.rocklayers", prompt:"Why can deeper rock layers often contain older fossils?", answer:"Newer layers are usually deposited on top", distractors:["Gravity makes fossils younger","Dinosaurs only lived underground","Sunlight makes rocks older"], scene:"dinosaur", detail:"layers" },
+    { min:5, objective:"dino.extinction", prompt:"What event is strongly linked to the extinction of non-bird dinosaurs?", answer:"A large asteroid impact", distractors:["A single volcano in Australia","The Moon disappearing","Humans hunting them"], scene:"dinosaur", detail:"asteroid" },
+    { min:6, objective:"dino.fossilisation", prompt:"Why is fossilisation uncommon?", answer:"Most remains decay before they can be buried and preserved", distractors:["All bones turn into fossils","Fossils only form in ice","Rocks destroy every bone immediately"], scene:"dinosaur", detail:"fossil" },
+  ],
+  habitats: [
+    { min:1, objective:"habitat.home", prompt:"What is a habitat?", answer:"The place where an organism lives", distractors:["A type of food","A weather event","A body part"], scene:"habitat", detail:"home" },
+    { min:1, objective:"habitat.desert", prompt:"Which animal is well suited to a hot, dry desert?", answer:"Camel", distractors:["Penguin","Frog","Polar bear"], scene:"habitat", detail:"desert" },
+    { min:1, objective:"habitat.ocean", prompt:"Which animal lives in an ocean habitat?", answer:"Dolphin", distractors:["Kangaroo","Koala","Camel"], scene:"habitat", detail:"ocean" },
+    { min:2, objective:"habitat.needs", prompt:"Animals need a habitat that provides...", answer:"Food, water and shelter", distractors:["Only sunshine","Only rocks","Only other animals"], scene:"habitat", detail:"needs" },
+    { min:2, objective:"habitat.adaptation", prompt:"What is an adaptation?", answer:"A feature that helps an organism survive", distractors:["A kind of weather","A baby animal","A type of rock"], scene:"habitat", detail:"adaptation" },
+    { min:3, objective:"habitat.polar", prompt:"Why does thick fur help a polar animal?", answer:"It helps keep body heat in", distractors:["It makes the animal fly","It creates food","It makes ice melt"], scene:"habitat", detail:"polar" },
+    { min:3, objective:"habitat.camouflage", prompt:"How can camouflage help an animal?", answer:"It can make the animal harder to see", distractors:["It makes the animal bigger","It changes the weather","It creates water"], scene:"habitat", detail:"camouflage" },
+    { min:4, objective:"habitat.foodchain", prompt:"In a simple food chain, what does an arrow show?", answer:"The direction energy moves", distractors:["Which animal is fastest","Where north is","How old an animal is"], scene:"habitat", detail:"foodchain" },
+    { min:5, objective:"habitat.producer", prompt:"Why are green plants called producers?", answer:"They make their own food using light", distractors:["They hunt other animals","They produce rain","They eat rocks"], scene:"habitat", detail:"producer" },
+    { min:6, objective:"habitat.change", prompt:"What can happen if a habitat loses an important food source?", answer:"Animals may need to move or their population may fall", distractors:["Nothing can change","Every animal becomes a plant","The habitat becomes a planet"], scene:"habitat", detail:"change" },
+  ],
+};
+
 function money(v: number) {
-  return v < 100 ? `${v}c` : `${(v / 100).toFixed(v % 100 === 0 ? 0 : 2)}`;
+  return v < 100 ? `${v}c` : `$${(v / 100).toFixed(v % 100 === 0 ? 0 : 2)}`;
 }
 
 function countLabel(count: number, singular: string, plural = singular + "s") {
@@ -447,6 +510,24 @@ export function generateQuestion(skillId: string, stage: number, seed: number): 
       seed,
       undefined,
       { kind: "counters", red, blue }
+    );
+  }
+
+
+  if (["solar","volcanoes","dinosaurs","habitats"].includes(skillId)) {
+    const pool = (SCIENCE_QUESTIONS[skillId] ?? []).filter((item) => item.min <= difficulty);
+    const item = pick(rng, pool);
+    return makeQuestion(
+      skillId,
+      item.objective,
+      difficulty,
+      "science_choice",
+      item.prompt,
+      textChoices(rng, item.answer, item.distractors),
+      item.answer,
+      seed,
+      undefined,
+      { kind:"science_scene", scene:item.scene, detail:item.detail }
     );
   }
 

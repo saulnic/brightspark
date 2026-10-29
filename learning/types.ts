@@ -1,4 +1,4 @@
-export type Subject = "maths" | "english";
+export type Subject = "maths" | "english" | "science";
 
 export type QuestionChoice = {
   id: string;

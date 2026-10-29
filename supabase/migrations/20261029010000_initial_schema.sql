@@ -21,7 +21,7 @@ create table if not exists public.learners (
 
 create table if not exists public.skills (
   id text primary key,
-  subject text not null check (subject in ('maths','english')),
+  subject text not null check (subject in ('maths','english','science')),
   name text not null,
   sort_order integer not null,
   stage_count smallint not null default 8 check (stage_count between 1 and 20),
@@ -135,7 +135,11 @@ values
   ('spelling','english','Spelling',110),
   ('reading','english','Reading',120),
   ('grammar','english','Grammar',130),
-  ('vocab','english','Vocabulary',140)
+  ('vocab','english','Vocabulary',140),
+  ('solar','science','Solar system',210),
+  ('volcanoes','science','Volcanoes',220),
+  ('dinosaurs','science','Dinosaurs & fossils',230),
+  ('habitats','science','Animals & habitats',240)
 on conflict (id) do update
 set subject = excluded.subject,
     name = excluded.name,
