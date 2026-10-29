@@ -15,6 +15,7 @@ export type ScienceLesson = {
     prompt: string;
     answer: string;
     distractors: string[];
+    reviewPrompt?: string;
     visual?: { kind: "science_scene"; scene: ScienceScene; detail?: string };
   }[];
 };
@@ -33,12 +34,12 @@ const LESSONS: Record<string, ScienceLesson[]> = {
         {id:"pluto",text:"Pluto used to be called the ninth planet, but scientists now classify it as a dwarf planet."},
       ],
       questions:[
-        {factId:"sun",prompt:"What is at the centre of our Solar System?",answer:"The Sun",distractors:["Earth","The Moon","Jupiter"],visual:{kind:"science_scene",scene:"solar",detail:"sun"}},
-        {factId:"orbit",prompt:"What does orbit mean?",answer:"To travel around another object in space",distractors:["To stop moving","To shine like a star","To spin in one place"]},
-        {factId:"eight",prompt:"How many planets orbit the Sun?",answer:"Eight",distractors:["Seven","Nine","Ten"]},
-        {factId:"earth",prompt:"Which planet do we live on?",answer:"Earth",distractors:["Mars","Venus","Mercury"],visual:{kind:"science_scene",scene:"solar",detail:"earth"}},
-        {factId:"mercury",prompt:"Which planet is closest to the Sun?",answer:"Mercury",distractors:["Earth","Mars","Neptune"]},
-        {factId:"pluto",prompt:"What is Pluto classified as today?",answer:"A dwarf planet",distractors:["A star","A moon","A comet"]},
+        {factId:"sun",prompt:"What is at the centre of our Solar System?",reviewPrompt:"If you drew the Solar System with the most important object in the middle, what would go there?",answer:"The Sun",distractors:["Earth","The Moon","Jupiter"],visual:{kind:"science_scene",scene:"solar",detail:"sun"}},
+        {factId:"orbit",prompt:"What does orbit mean?",reviewPrompt:"Which description matches what the Moon does as it orbits Earth?",answer:"To travel around another object in space",distractors:["To stop moving","To shine like a star","To spin in one place"]},
+        {factId:"eight",prompt:"How many planets orbit the Sun?",reviewPrompt:"How many planets would you count travelling around the Sun?",answer:"Eight",distractors:["Seven","Nine","Ten"]},
+        {factId:"earth",prompt:"Which planet do we live on?",reviewPrompt:"Which planet is our home and is third from the Sun?",answer:"Earth",distractors:["Mars","Venus","Mercury"],visual:{kind:"science_scene",scene:"solar",detail:"earth"}},
+        {factId:"mercury",prompt:"Which planet is closest to the Sun?",reviewPrompt:"Which planet has the shortest distance to the Sun?",answer:"Mercury",distractors:["Earth","Mars","Neptune"]},
+        {factId:"pluto",prompt:"What is Pluto classified as today?",reviewPrompt:"Scientists no longer count Pluto as one of the eight planets. What do they call it?",answer:"A dwarf planet",distractors:["A star","A moon","A comet"]},
       ],
     },
     {
@@ -279,13 +280,9 @@ export function scienceQuestionAt(lesson:ScienceLesson, index:number, seed:numbe
   const isReview=index>=directCount;
   const fact=lesson.facts.find((item)=>item.id===source.factId);
   let prompt=source.prompt;
-  if(isReview && fact) {
-    const lowerFact=fact.text.toLowerCase();
-    const lowerAnswer=source.answer.toLowerCase();
-    const at=lowerFact.indexOf(lowerAnswer);
-    prompt=at>=0
-      ? `Complete the fact: ${fact.text.slice(0,at)}_____${fact.text.slice(at+source.answer.length)}`
-      : `Which answer matches this fact? ${fact.text}`;
+  if(isReview) {
+    const reviewLeads=["Think about what you learned: ","Try it another way: ","Quick check: "];
+    prompt=source.reviewPrompt ?? `${reviewLeads[index%reviewLeads.length]}${source.prompt}`;
   }
   const values=shuffle([source.answer,...source.distractors],seed+index*97);
   const choices:QuestionChoice[]=values.map((value,i)=>({id:`c${i}`,label:value,value}));
@@ -298,12 +295,12 @@ export function scienceQuestionAt(lesson:ScienceLesson, index:number, seed:numbe
     difficulty:lesson.stage,
     questionType:"science_lesson",
     prompt,
-    visual:source.visual,
+    visual:source.visual ?? {kind:"science_scene",scene:lesson.scene},
     choices,
     correctChoiceId:correct.id,
     explanation:lesson.facts.find((fact)=>fact.id===source.factId)?.text,
     seed,
-    contentVersion:"science-lesson-2",
+    contentVersion:"science-lesson-3",
   };
 }
 

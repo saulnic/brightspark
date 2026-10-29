@@ -5,7 +5,7 @@ import { InstantLink } from "@/components/system/InstantLink";
 import type { AvatarConfig } from "@/content/avatar";
 
 type P = { skill_id:string; stage:number; xp:number };
-type C = { skillId:string; skillName:string; rewardName:string; targetCorrect:number } | null;
+type C = { skillId:string; skillName:string; rewardName:string; targetCorrect:number; roundSize:number } | null;
 
 export function LearnerHome({
   learnerId, learnerName, avatar, progress, challenge,
@@ -31,7 +31,7 @@ export function LearnerHome({
 
     {challenge ? <InstantLink className="bonusChallenge" href={`/learn/${learnerId}/${challenge.skillId}`}>
       <span className="bonusIcon">🕶️</span>
-      <span><strong>Bonus challenge</strong><small>Get {challenge.targetCorrect}/5 in {challenge.skillName} now to unlock sunglasses.</small></span>
+      <span><strong>Bonus challenge</strong><small>Get {challenge.targetCorrect}/{challenge.roundSize} in {challenge.skillName} now to unlock sunglasses.</small></span>
       <b>›</b>
     </InstantLink> : null}
 

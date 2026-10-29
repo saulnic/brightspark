@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { generateQuestion } from "@/learning/generate-question";
@@ -9,6 +9,7 @@ import type { LearningQuestion } from "@/learning/types";
 import { ChoiceVisual, QuestionVisual } from "./QuestionVisual";
 import { ScienceLessonCard } from "./ScienceLessonCard";
 import { getScienceLesson, scienceQuestionAt } from "@/content/science-lessons";
+import { REWARDS, type Reward } from "@/content/rewards";
 
 const DEFAULT_ROUND_SIZE = 5;
 const SCIENCE_ROUND_SIZE = 10;
@@ -42,14 +43,18 @@ export function QuestionPlayer({
   skillName,
   initialStage,
   initialXp,
+  initialStars,
   bonusRewardId,
+  bonusTargetCorrect,
 }: {
   learnerId: string;
   skillId: string;
   skillName: string;
   initialStage: number;
   initialXp: number;
+  initialStars: number;
   bonusRewardId?: string;
+  bonusTargetCorrect?: number;
 }) {
   const [roundKey, setRoundKey] = useState(0);
   const [seeds, setSeeds] = useState(seedsForRound);
@@ -62,9 +67,42 @@ export function QuestionPlayer({
   const [stage, setStage] = useState(initialStage);
   const [xp, setXp] = useState(initialXp);
   const [bonusUnlocked, setBonusUnlocked] = useState(false);
+  const [totalStars, setTotalStars] = useState(initialStars);
+  const [earnedNow, setEarnedNow] = useState<Reward[]>([]);
+  const [rewardPopupOpen, setRewardPopupOpen] = useState(false);
+  const [restored, setRestored] = useState(false);
   const scienceLesson = useMemo(() => getScienceLesson(skillId, stage), [skillId, stage]);
   const [lessonStarted, setLessonStarted] = useState(false);
   const roundSize = scienceLesson ? SCIENCE_ROUND_SIZE : DEFAULT_ROUND_SIZE;
+  const storageKey = `brightspark:round:${learnerId}:${skillId}`;
+
+  useEffect(() => {
+    try {
+      const raw = window.localStorage.getItem(storageKey);
+      if (raw) {
+        const saved = JSON.parse(raw) as {version:number;stage:number;xp:number;index:number;answers:typeof answers;seeds:number[];lessonStarted:boolean};
+        if (saved.version===1 && saved.stage===initialStage && saved.xp===initialXp && Array.isArray(saved.seeds) && saved.seeds.length>=roundSize && saved.index>=0 && saved.index<roundSize) {
+          setSeeds(saved.seeds);
+          setIndex(saved.index);
+          setAnswers(Array.isArray(saved.answers)?saved.answers:[]);
+          setLessonStarted(Boolean(saved.lessonStarted));
+          setSelected(null);
+          setStartedAt(Date.now());
+        }
+      }
+    } catch {}
+    setRestored(true);
+  }, [storageKey, initialStage, initialXp, roundSize]);
+
+  function persistRound(nextIndex:number,nextAnswers:typeof answers,nextLessonStarted=lessonStarted) {
+    try {
+      window.localStorage.setItem(storageKey, JSON.stringify({version:1,stage:initialStage,xp:initialXp,index:nextIndex,answers:nextAnswers,seeds,lessonStarted:nextLessonStarted}));
+    } catch {}
+  }
+
+  function clearSavedRound() {
+    try { window.localStorage.removeItem(storageKey); } catch {}
+  }
 
   const question = useMemo(() => {
     if (scienceLesson) {
@@ -107,6 +145,7 @@ export function QuestionPlayer({
       setIndex(index + 1);
       setSelected(null);
       setStartedAt(Date.now());
+      persistRound(index + 1, nextAnswers);
       return;
     }
 
@@ -155,6 +194,11 @@ export function QuestionPlayer({
         nextStage += 1;
       }
 
+      const oldSkillStars=(Math.max(1,stage)-1)*30+xp;
+      const nextSkillStars=(Math.max(1,nextStage)-1)*30+nextXp;
+      const nextTotalStars=Math.max(0,totalStars-oldSkillStars+nextSkillStars);
+      const newlyEarned=REWARDS.filter((reward)=>reward.stars!==null&&totalStars<reward.stars&&nextTotalStars>=reward.stars);
+
       await supabase.from("learner_skill_progress").upsert({
         learner_id: learnerId,
         skill_id: skillId,
@@ -163,7 +207,7 @@ export function QuestionPlayer({
         last_practised_at: new Date().toISOString(),
       });
 
-      if (bonusRewardId && correct >= 4) {
+      if (bonusRewardId && correct >= (bonusTargetCorrect ?? Math.ceil(roundSize * 0.8))) {
         const { data: learnerRow } = await supabase.from("learners").select("avatar_config").eq("id", learnerId).single();
         const current = (learnerRow?.avatar_config ?? {}) as Record<string, unknown>;
         const unlocked = Array.isArray(current.unlockedRewards) ? current.unlockedRewards.filter((value): value is string => typeof value === "string") : [];
@@ -174,7 +218,11 @@ export function QuestionPlayer({
 
       setStage(nextStage);
       setXp(nextXp);
+      setTotalStars(nextTotalStars);
       setAnswers(nextAnswers);
+      setEarnedNow(newlyEarned);
+      if(newlyEarned.length)setRewardPopupOpen(true);
+      clearSavedRound();
       emitFeedback("complete");
     } finally {
       setSaving(false);
@@ -190,16 +238,25 @@ export function QuestionPlayer({
     setStartedAt(Date.now());
     setDone(false);
     setLessonStarted(false);
+    clearSavedRound();
+    setEarnedNow([]);
+    setRewardPopupOpen(false);
     setRoundKey((v) => v + 1);
   }
 
+  if (!restored) {
+    return <section className="routeLoading" role="status"><span className="routeSpinner" aria-hidden="true"/><strong>Loading…</strong></section>;
+  }
+
   if (scienceLesson && !lessonStarted && !done) {
-    return <ScienceLessonCard lesson={scienceLesson} onStart={() => { setLessonStarted(true); setStartedAt(Date.now()); }} />;
+    return <ScienceLessonCard lesson={scienceLesson} onStart={() => { setLessonStarted(true); setStartedAt(Date.now()); persistRound(index, answers, true); }} />;
   }
 
   if (done) {
     const score = answers.filter((a) => a.correct).length;
     return (
+      <>
+      {rewardPopupOpen && earnedNow.length ? <div className="rewardModalBackdrop" role="dialog" aria-modal="true" aria-label="New reward earned"><div className="rewardModal"><div className="rewardModalIcon">{earnedNow.map(r=>r.icon).join(" ")}</div><p className="eyebrow">New reward{earnedNow.length>1?"s":""}!</p><h2>{earnedNow.map(r=>r.name).join(", ")}</h2><p>You earned {earnedNow.length>1?"these rewards":"this reward"} with your stars.</p><div className="rewardModalActions"><Link className="primaryButton" href={`/learn/${learnerId}/rewards`} prefetch>Go to rewards</Link><button className="secondaryButton" onClick={()=>setRewardPopupOpen(false)}>Keep learning</button></div></div></div>:null}
       <section className="finishCard">
         <div className="finishEmoji">{score >= 4 ? "🌟" : score >= 3 ? "👏" : "💪"}</div>
         <h1>{score}/{roundSize} correct</h1>
@@ -211,6 +268,7 @@ export function QuestionPlayer({
           <Link className="secondaryButton" href={`/learn/${learnerId}`} prefetch>Back to topics</Link>
         </div>
       </section>
+      </>
     );
   }
 

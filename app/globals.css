@@ -259,3 +259,12 @@ small { color:#77718a; }
 .routeSpinner{width:34px;height:34px;border:4px solid #ddd6f7;border-right-color:#6f5bd3;border-radius:50%;animation:navSpin .65s linear infinite}
 .topicCard:active,.profileChip:active,.starPill:active,.secondaryButton:active,.primaryButton:active{transform:scale(.985)}
 @keyframes navSpin{to{transform:rotate(360deg)}}
+
+.rewardModalBackdrop{position:fixed;inset:0;z-index:1000;background:rgba(31,29,47,.42);display:grid;place-items:center;padding:20px}
+.rewardModal{width:min(430px,100%);background:#fff;border-radius:26px;padding:24px;text-align:center;box-shadow:0 24px 70px rgba(28,24,54,.25)}
+.rewardModalIcon{font-size:3.2rem;line-height:1;margin-bottom:10px}
+.rewardModal h2{margin:4px 0 8px;font-size:1.6rem}
+.rewardModal p{margin:0 0 16px;color:#666174}
+.rewardModalActions{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.rewardModalActions a,.rewardModalActions button{text-align:center}
+@media(max-width:520px){.rewardModalActions{grid-template-columns:1fr}}
