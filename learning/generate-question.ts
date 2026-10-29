@@ -79,7 +79,7 @@ function makeQuestion(
     correctChoiceId: correct.id,
     explanation,
     seed,
-    contentVersion: "1.2",
+    contentVersion: "1.3",
   };
 }
 
@@ -219,16 +219,47 @@ export function generateQuestion(skillId: string, stage: number, seed: number): 
   }
 
   if (skillId === "fractions") {
-    const denominators = difficulty < 3 ? [2,4] : [2,3,4,5,8];
-    const denominator = pick(rng, denominators);
-    const numerator = int(rng, 1, Math.max(1, denominator - 1));
-
-    if (rng() < 0.5) {
+    if (difficulty === 1) {
+      const denominator = pick(rng, [2,4]);
+      const numerator = 1;
       const label = `${numerator}/${denominator}`;
-      return makeQuestion("fractions", "fraction.identify", difficulty, "fraction_words", `Which fraction means ${numerator} out of ${denominator} equal parts?`, textChoices(rng, label, [`${Math.min(denominator, numerator + 1)}/${denominator}`, `${numerator}/${denominator + 1}`, `${denominator}/${numerator}`]), label, seed);
+      const distractors = denominator === 2 ? ["1/4","2/2","2/4"] : ["1/2","2/4","3/4"];
+      return makeQuestion(
+        "fractions",
+        "fraction.visual_identify",
+        difficulty,
+        "fraction_visual",
+        "What fraction is shaded?",
+        textChoices(rng, label, distractors),
+        label,
+        seed,
+        undefined,
+        { kind: "fraction_bar", numerator, denominator }
+      );
     }
 
-    const groups = denominator * int(rng, 1, 4);
+    const denominators = difficulty < 4 ? [2,4] : [2,3,4,5,8];
+    const denominator = pick(rng, denominators);
+    const numerator = difficulty === 2 ? 1 : int(rng, 1, Math.max(1, denominator - 1));
+
+    if (rng() < (difficulty === 2 ? 0.7 : 0.5)) {
+      const label = `${numerator}/${denominator}`;
+      return makeQuestion(
+        "fractions",
+        "fraction.identify",
+        difficulty,
+        "fraction_visual",
+        "What fraction is shaded?",
+        textChoices(rng, label, [`1/${denominator}`, `${Math.min(denominator, numerator + 1)}/${denominator}`, `${numerator}/${denominator + 1}`]),
+        label,
+        seed,
+        undefined,
+        { kind: "fraction_bar", numerator, denominator }
+      );
+    }
+
+    const multiplier = difficulty === 2 ? int(rng, 1, 2) : int(rng, 1, 4);
+    const groups = denominator * multiplier;
     const correct = (groups / denominator) * numerator;
     return makeQuestion("fractions", "fraction.of_set", difficulty, "fraction_set", `What is ${numerator}/${denominator} of ${groups}?`, numericChoices(rng, correct, Math.max(3, denominator)), correct, seed);
   }
@@ -247,7 +278,18 @@ export function generateQuestion(skillId: string, stage: number, seed: number): 
 
     const cents = a + b;
     const correct = money(cents);
-    return makeQuestion("money", "money.total", difficulty, "money_total", `You have ${money(a)} and ${money(b)}. How much altogether?`, textChoices(rng, correct, [money(cents + 10), money(Math.max(5, cents - 10)), money(cents + 50)]), correct, seed);
+    return makeQuestion(
+      "money",
+      "money.total",
+      difficulty,
+      "money_total",
+      "How much altogether?",
+      textChoices(rng, correct, [money(cents + 10), money(Math.max(5, cents - 10)), money(cents + 50)]),
+      correct,
+      seed,
+      undefined,
+      { kind: "money_coins", coins: [a, b] }
+    );
   }
 
   if (skillId === "time") {
@@ -284,7 +326,7 @@ export function generateQuestion(skillId: string, stage: number, seed: number): 
       if (blue === yellow) blue += 5;
       const askLonger = rng() > 0.5;
       const correct = askLonger ? (yellow > blue ? "Yellow ribbon" : "Blue ribbon") : (yellow < blue ? "Yellow ribbon" : "Blue ribbon");
-      return makeQuestion("measure", "measure.length.compare", difficulty, "measurement_compare", `Which ribbon is ${askLonger ? "longer" : "shorter"}?`, textChoices(rng, correct, [correct === "Yellow ribbon" ? "Blue ribbon" : "Yellow ribbon", "They are equal"]), correct, seed, undefined, { kind: "ribbons", yellow, blue, unit: "cm" });
+      return makeQuestion("measure", "measure.length.compare", difficulty, "measurement_compare", `Which ribbon is ${askLonger ? "longer" : "shorter"}?`, textChoices(rng, correct, [correct === "Yellow ribbon" ? "Blue ribbon" : "Yellow ribbon", "They are equal"]), correct, seed, undefined, { kind: "ribbons", yellow, blue, unit: "cm", scaffold: difficulty });
     }
 
     if (mode === 1) {
@@ -327,15 +369,35 @@ export function generateQuestion(skillId: string, stage: number, seed: number): 
   }
 
   if (skillId === "patterns") {
-    if (difficulty > 2 && rng() < 0.35) {
-      const a = pick(rng, ["🔵","🟢","🟣","🟡"]);
-      const b = pick(rng, ["⭐","❤️","🔺","⬜"]);
-      const correct = a;
-      return makeQuestion("patterns", "patterns.visual", difficulty, "visual_pattern", `What comes next?  ${a} ${b} ${a} ${b} __`, textChoices(rng, correct, [b,"🔶","⚫"]), correct, seed);
+    const visualMode = difficulty <= 2 || (difficulty === 3 && rng() < 0.65);
+    if (visualMode) {
+      const sets = [
+        ["☀️","🌙","🔺"],
+        ["🔵","🟡","🟢"],
+        ["⭐","❤️","⬜"],
+        ["🍎","🍌","🍇"],
+      ] as const;
+      const symbols = pick(rng, sets);
+      const pattern = difficulty === 1
+        ? [symbols[0], symbols[1], symbols[0], symbols[1], symbols[0]]
+        : [symbols[0], symbols[1], symbols[2], symbols[0], symbols[1], symbols[2], symbols[0]];
+      const correct = difficulty === 1 ? symbols[1] : symbols[1];
+      return makeQuestion(
+        "patterns",
+        "patterns.visual",
+        difficulty,
+        "visual_pattern",
+        "What comes next?",
+        textChoices(rng, correct, symbols.filter((s) => s !== correct) as string[]),
+        correct,
+        seed,
+        undefined,
+        { kind: "pattern_strip", items: pattern }
+      );
     }
 
-    const start = int(rng, 1, difficulty === 1 ? 6 : 10);
-    const step = difficulty === 1 ? pick(rng, [1,2]) : difficulty === 2 ? pick(rng, [1,2,3]) : difficulty < 5 ? pick(rng, [2,3,4,5]) : pick(rng, [2,3,4,5,10]);
+    const start = int(rng, 1, difficulty < 5 ? 10 : 20);
+    const step = difficulty === 3 ? pick(rng, [1,2]) : difficulty < 5 ? pick(rng, [2,3,4]) : pick(rng, [2,3,4,5,10]);
     const seq = [start, start + step, start + step * 2, start + step * 3];
     const correct = start + step * 4;
     return makeQuestion("patterns", "patterns.number", difficulty, "number_pattern", `What comes next?  ${seq.join(", ")}, …`, numericChoices(rng, correct, Math.max(3, step + 2)), correct, seed);

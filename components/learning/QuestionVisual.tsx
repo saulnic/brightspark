@@ -44,10 +44,11 @@ export function QuestionVisual({ question }: { question: LearningQuestion }) {
     const yellow = Number(visual.yellow);
     const blue = Number(visual.blue);
     const max = Math.max(yellow, blue);
+    const scaffold = Number(visual.scaffold ?? 1);
     return (
       <div className="visualStage ribbonStage">
-        <Ribbon label="Yellow ribbon" value={yellow} max={max} className="yellowRibbon" />
-        <Ribbon label="Blue ribbon" value={blue} max={max} className="blueRibbon" />
+        <Ribbon label="Yellow ribbon" value={yellow} max={max} scaffold={scaffold} className="yellowRibbon" />
+        <Ribbon label="Blue ribbon" value={blue} max={max} scaffold={scaffold} className="blueRibbon" />
       </div>
     );
   }
@@ -57,6 +58,39 @@ export function QuestionVisual({ question }: { question: LearningQuestion }) {
       <div className="visualStage objectPair">
         <div className="measureObject"><div className="fruitIcon">🍎</div><strong>Apple</strong><span>{Number(visual.apple)} g</span></div>
         <div className="measureObject"><div className="fruitIcon">🍊</div><strong>Orange</strong><span>{Number(visual.orange)} g</span></div>
+      </div>
+    );
+  }
+
+  if (visual.kind === "fraction_bar") {
+    const numerator = Number(visual.numerator);
+    const denominator = Number(visual.denominator);
+    return (
+      <div className="visualStage fractionStage" aria-label={`${numerator} of ${denominator} equal parts shaded`}>
+        <div className="fractionBar">
+          {Array.from({ length: denominator }, (_, i) => (
+            <span key={i} className={i < numerator ? "fractionPart shaded" : "fractionPart"} />
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (visual.kind === "money_coins") {
+    const coins = Array.isArray(visual.coins) ? visual.coins.map(Number) : [];
+    return (
+      <div className="visualStage coinStage" aria-label="Australian money">
+        {coins.map((coin, index) => <Coin value={coin} key={`${coin}-${index}`} />)}
+      </div>
+    );
+  }
+
+  if (visual.kind === "pattern_strip") {
+    const items = Array.isArray(visual.items) ? visual.items.map(String) : [];
+    return (
+      <div className="visualStage patternStage" aria-label="Repeating pattern">
+        {items.map((item, index) => <span className="patternItem" key={index}>{item}</span>)}
+        <span className="patternBlank">?</span>
       </div>
     );
   }
@@ -117,11 +151,27 @@ function Jug({ colour, value, unit }: { colour: "red" | "green"; value: number; 
   );
 }
 
-function Ribbon({ label, value, max, className }: { label: string; value: number; max: number; className: string }) {
+function Ribbon({ label, value, max, scaffold, className }: { label: string; value: number; max: number; scaffold: number; className: string }) {
+  const proportional = Math.max(35, (value / max) * 68);
+  const width = scaffold <= 1 ? proportional : scaffold === 2 ? 56 + (value / max) * 12 : 64;
   return (
     <div className="ribbonRow">
       <div><strong>{label}</strong><span>{value} cm</span></div>
-      <div className={`ribbonBar ${className}`} style={{ width: `${Math.max(35, (value / max) * 68)}%` }} />
+      <div className={`ribbonBar ${className}`} style={{ width: `${width}%` }} />
+    </div>
+  );
+}
+
+function Coin({ value }: { value: number }) {
+  const dollars = value >= 100;
+  const label = dollars ? `${value / 100}` : `${value}c`;
+  const gold = value === 100 || value === 200;
+  return (
+    <div className="coinItem">
+      <div className={gold ? "coin goldCoin" : "coin silverCoin"} aria-hidden="true">
+        <span>{label}</span>
+      </div>
+      <strong>{label}</strong>
     </div>
   );
 }

@@ -192,8 +192,8 @@ export function QuestionPlayer({
       <div className="progressTrack"><div style={{ width: `${((index + 1) / ROUND_SIZE) * 100}%` }} /></div>
 
       <section className="questionCard">
-        <QuestionVisual question={question} />
         <h1 className="questionPrompt">{question.prompt}</h1>
+        <QuestionVisual question={question} />
         <div className={`answerGrid choices-${question.choices.length}`}>
           {question.choices.map((choice) => {
             const isSelected = selected === choice.id;
