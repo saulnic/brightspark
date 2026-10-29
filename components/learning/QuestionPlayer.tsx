@@ -6,6 +6,8 @@ import { generateQuestion } from "@/learning/generate-question";
 import { validateQuestion } from "@/learning/validate-question";
 import type { LearningQuestion } from "@/learning/types";
 import { ChoiceVisual, QuestionVisual } from "./QuestionVisual";
+import { ScienceLessonCard } from "./ScienceLessonCard";
+import { getScienceLesson, scienceQuestionAt } from "@/content/science-lessons";
 
 const ROUND_SIZE = 5;
 
@@ -58,8 +60,17 @@ export function QuestionPlayer({
   const [stage, setStage] = useState(initialStage);
   const [xp, setXp] = useState(initialXp);
   const [bonusUnlocked, setBonusUnlocked] = useState(false);
+  const scienceLesson = useMemo(() => getScienceLesson(skillId, stage), [skillId, stage]);
+  const [lessonStarted, setLessonStarted] = useState(false);
 
   const question = useMemo(() => {
+    if (scienceLesson) {
+      const candidate = scienceQuestionAt(scienceLesson, index, seeds[index]);
+      const validation = validateQuestion(candidate);
+      if (!validation.valid) throw new Error(validation.errors.join(" "));
+      return candidate;
+    }
+
     const used = new Set(answers.map((answer) => conceptSignature(answer.question)));
     let candidate = generateQuestion(skillId, stage, seeds[index]);
 
@@ -70,7 +81,7 @@ export function QuestionPlayer({
     const validation = validateQuestion(candidate);
     if (!validation.valid) throw new Error(validation.errors.join(" "));
     return candidate;
-  }, [skillId, stage, seeds, index, roundKey, answers]);
+  }, [skillId, stage, seeds, index, roundKey, answers, scienceLesson]);
 
   function choose(choiceId: string) {
     if (selected) return;
@@ -175,7 +186,12 @@ export function QuestionPlayer({
     setSelected(null);
     setStartedAt(Date.now());
     setDone(false);
+    setLessonStarted(false);
     setRoundKey((v) => v + 1);
+  }
+
+  if (scienceLesson && !lessonStarted && !done) {
+    return <ScienceLessonCard lesson={scienceLesson} onStart={() => { setLessonStarted(true); setStartedAt(Date.now()); }} />;
   }
 
   if (done) {

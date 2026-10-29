@@ -1,6 +1,7 @@
 "use client";
 
 import type { LearningQuestion, QuestionChoice } from "@/learning/types";
+import { ScienceSceneVisual } from "./ScienceLessonCard";
 
 export function QuestionVisual({ question }: { question: LearningQuestion }) {
   const visual = question.visual as Record<string, unknown> | undefined;
@@ -31,54 +32,10 @@ export function QuestionVisual({ question }: { question: LearningQuestion }) {
 
 
   if (visual.kind === "science_scene") {
-    const scene = String(visual.scene ?? "");
+    const scene = String(visual.scene ?? "") as "solar" | "volcano" | "dinosaur" | "habitat";
     return (
-      <div className="visualStage scienceStage" aria-label={`Science illustration: ${scene}`}>
-        {scene === "solar" ? (
-          <svg className="scienceIllustration" viewBox="0 0 360 180" role="img" aria-label="Solar system illustration">
-            <circle cx="55" cy="90" r="34" fill="#f5c84c" />
-            <circle cx="132" cy="90" r="12" fill="#6fa9df" />
-            <circle cx="172" cy="90" r="7" fill="#d9875f" />
-            <circle cx="227" cy="90" r="20" fill="#d7b07b" />
-            <ellipse cx="292" cy="90" rx="27" ry="10" fill="none" stroke="#c8a15f" strokeWidth="5" />
-            <circle cx="292" cy="90" r="15" fill="#d7b36f" />
-            <path d="M110 90H338" stroke="#ddd8ea" strokeWidth="2" strokeDasharray="5 7" />
-            <circle cx="145" cy="70" r="3" fill="#c7c1d4" />
-          </svg>
-        ) : null}
-        {scene === "volcano" ? (
-          <svg className="scienceIllustration" viewBox="0 0 360 180" role="img" aria-label="Volcano cross-section illustration">
-            <path d="M70 150 L176 38 L290 150 Z" fill="#8d765f" />
-            <path d="M160 65 L176 38 L194 66 L183 87 L168 87 Z" fill="#ef6a42" />
-            <path d="M173 86 C168 110 167 128 166 150" stroke="#e95832" strokeWidth="12" fill="none" />
-            <ellipse cx="167" cy="153" rx="42" ry="18" fill="#e95832" opacity=".9" />
-            <circle cx="166" cy="24" r="15" fill="#b9b1bd" opacity=".9" />
-            <circle cx="190" cy="18" r="18" fill="#c8c0ca" opacity=".8" />
-            <circle cx="215" cy="31" r="12" fill="#b9b1bd" opacity=".8" />
-          </svg>
-        ) : null}
-        {scene === "dinosaur" ? (
-          <svg className="scienceIllustration" viewBox="0 0 360 180" role="img" aria-label="Dinosaur and fossil illustration">
-            <path d="M78 120 Q110 88 150 104 Q178 116 204 95 Q225 80 245 88 Q263 96 250 111 Q235 126 204 121 Q174 116 154 128 Q126 145 93 139Z" fill="#79a96c" />
-            <circle cx="239" cy="98" r="4" fill="#25243a" />
-            <path d="M150 126 L136 156 M179 121 L187 156" stroke="#5f8158" strokeWidth="10" strokeLinecap="round" />
-            <path d="M86 121 Q55 105 47 82" stroke="#79a96c" strokeWidth="12" fill="none" strokeLinecap="round" />
-            <ellipse cx="282" cy="138" rx="42" ry="22" fill="#d8c7a2" />
-            <path d="M260 139 Q274 118 290 139 Q302 156 316 136" stroke="#8a7658" strokeWidth="5" fill="none" />
-          </svg>
-        ) : null}
-        {scene === "habitat" ? (
-          <svg className="scienceIllustration" viewBox="0 0 360 180" role="img" aria-label="Animal habitat illustration">
-            <circle cx="295" cy="38" r="22" fill="#f4cc59" />
-            <path d="M0 118 Q70 90 140 118 T280 118 T360 118 V180 H0Z" fill="#8fc37b" />
-            <path d="M0 142 Q90 125 180 143 T360 143 V180 H0Z" fill="#73a8d5" />
-            <rect x="72" y="69" width="14" height="62" fill="#805b3d" />
-            <circle cx="79" cy="60" r="33" fill="#6aa05b" />
-            <circle cx="239" cy="118" r="18" fill="#9b7659" />
-            <circle cx="252" cy="107" r="12" fill="#9b7659" />
-            <circle cx="256" cy="104" r="2.5" fill="#25243a" />
-          </svg>
-        ) : null}
+      <div className="visualStage scienceStage">
+        <ScienceSceneVisual scene={scene} />
       </div>
     );
   }
