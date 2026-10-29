@@ -150,12 +150,11 @@ export function QuestionPlayer({
       });
 
       if (bonusRewardId && correct >= 4) {
-        const { error: rewardError } = await supabase.from("learner_rewards").upsert({
-          learner_id: learnerId,
-          reward_id: bonusRewardId,
-          source: "avoided_skill_challenge",
-          metadata: { skill_id: skillId, score: correct, question_count: ROUND_SIZE },
-        });
+        const { data: learnerRow } = await supabase.from("learners").select("avatar_config").eq("id", learnerId).single();
+        const current = (learnerRow?.avatar_config ?? {}) as Record<string, unknown>;
+        const unlocked = Array.isArray(current.unlockedRewards) ? current.unlockedRewards.filter((value): value is string => typeof value === "string") : [];
+        const nextUnlocked = Array.from(new Set([...unlocked, bonusRewardId]));
+        const { error: rewardError } = await supabase.from("learners").update({ avatar_config: { ...current, unlockedRewards: nextUnlocked }, updated_at: new Date().toISOString() }).eq("id", learnerId);
         if (!rewardError) setBonusUnlocked(true);
       }
 
