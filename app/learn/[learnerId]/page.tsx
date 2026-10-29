@@ -1,5 +1,6 @@
 import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { LearnerHome } from "@/components/learning/LearnerHome";
 
 export const dynamic = "force-dynamic";
 
@@ -11,10 +12,7 @@ export default async function LearnerPage({
   const { learnerId } = await params;
   const supabase = await createClient();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
+  const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
   const { data: learner } = await supabase
@@ -25,26 +23,18 @@ export default async function LearnerPage({
 
   if (!learner) notFound();
 
-  return (
-    <main className="appShell">
-      <header className="topBar">
-        <a className="textButton" href="/home">
-          ← Learners
-        </a>
-        <div className="profileChip">
-          <span>🙂</span>
-          <strong>{learner.name}</strong>
-        </div>
-      </header>
+  const { data: progress } = await supabase
+    .from("learner_skill_progress")
+    .select("skill_id,stage,xp")
+    .eq("learner_id", learnerId);
 
-      <section className="heroCard">
-        <p className="eyebrow">Ready to learn?</p>
-        <h1>Hi {learner.name} 👋</h1>
-        <p>
-          Your BrightSpark profile is connected. The learning-module home screen
-          will plug in here next.
-        </p>
-      </section>
+  return (
+    <main className="appShell learningApp">
+      <header className="topBar compact">
+        <a className="textButton" href="/home">← Learners</a>
+        <div className="profileChip"><span>🙂</span><strong>{learner.name}</strong></div>
+      </header>
+      <LearnerHome learnerId={learner.id} learnerName={learner.name} progress={progress ?? []} />
     </main>
   );
 }
