@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { generateQuestion } from "@/learning/generate-question";
 import { validateQuestion } from "@/learning/validate-question";
@@ -56,6 +57,7 @@ export function QuestionPlayer({
   bonusRewardId?: string;
   bonusTargetCorrect?: number;
 }) {
+  const router = useRouter();
   const [roundKey, setRoundKey] = useState(0);
   const [seeds, setSeeds] = useState(seedsForRound);
   const [index, setIndex] = useState(0);
@@ -223,6 +225,7 @@ export function QuestionPlayer({
       setEarnedNow(newlyEarned);
       if(newlyEarned.length)setRewardPopupOpen(true);
       clearSavedRound();
+      router.refresh();
       emitFeedback("complete");
     } finally {
       setSaving(false);
@@ -256,7 +259,7 @@ export function QuestionPlayer({
     const score = answers.filter((a) => a.correct).length;
     return (
       <>
-      {rewardPopupOpen && earnedNow.length ? <div className="rewardModalBackdrop" role="dialog" aria-modal="true" aria-label="New reward earned"><div className="rewardModal"><div className="rewardModalIcon">{earnedNow.map(r=>r.icon).join(" ")}</div><p className="eyebrow">New reward{earnedNow.length>1?"s":""}!</p><h2>{earnedNow.map(r=>r.name).join(", ")}</h2><p>You earned {earnedNow.length>1?"these rewards":"this reward"} with your stars.</p><div className="rewardModalActions"><Link className="primaryButton" href={`/learn/${learnerId}/rewards`} prefetch>Go to rewards</Link><button className="secondaryButton" onClick={()=>setRewardPopupOpen(false)}>Keep learning</button></div></div></div>:null}
+      {rewardPopupOpen && earnedNow.length ? <div className="rewardModalBackdrop" role="dialog" aria-modal="true" aria-label="New reward earned"><div className="rewardModal"><div className="rewardModalIcon">{earnedNow.map(r=>r.icon).join(" ")}</div><p className="eyebrow">New reward{earnedNow.length>1?"s":""}!</p><h2>{earnedNow.map(r=>r.name).join(", ")}</h2><p>You earned {earnedNow.length>1?"these rewards":"this reward"} with your stars.</p><div className="rewardModalActions"><button className="primaryButton" onClick={()=>{setRewardPopupOpen(false);router.push(`/learn/${learnerId}/rewards`);router.refresh();}}>Go to rewards</button><button className="secondaryButton" onClick={()=>setRewardPopupOpen(false)}>Keep learning</button></div></div></div>:null}
       <section className="finishCard">
         <div className="finishEmoji">{score >= 4 ? "🌟" : score >= 3 ? "👏" : "💪"}</div>
         <h1>{score}/{roundSize} correct</h1>
@@ -265,7 +268,7 @@ export function QuestionPlayer({
         <div className="roundProgress">Stage {stage} · {xp}/30 XP</div>
         <div className="finishActions">
           <button className="primaryButton" onClick={playAgain}>Play again</button>
-          <Link className="secondaryButton" href={`/learn/${learnerId}`} prefetch>Back to topics</Link>
+          <button className="secondaryButton" onClick={()=>{router.push(`/learn/${learnerId}`);router.refresh();}}>Back to topics</button>
         </div>
       </section>
       </>
