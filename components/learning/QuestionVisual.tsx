@@ -80,7 +80,7 @@ export function QuestionVisual({ question }: { question: LearningQuestion }) {
     const coins = Array.isArray(visual.coins) ? visual.coins.map(Number) : [];
     return (
       <div className="visualStage coinStage" aria-label="Australian money">
-        {coins.map((coin, index) => <Coin value={coin} key={`${coin}-${index}`} />)}
+        {coins.map((coin, index) => <MoneyPiece value={coin} key={`${coin}-${index}`} />)}
       </div>
     );
   }

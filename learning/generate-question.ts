@@ -223,7 +223,7 @@ export function generateQuestion(skillId: string, stage: number, seed: number): 
       const denominator = pick(rng, [2,4]);
       const numerator = 1;
       const label = `${numerator}/${denominator}`;
-      const distractors = denominator === 2 ? ["1/4","2/2","2/4"] : ["1/2","2/4","3/4"];
+      const distractors = denominator === 2 ? ["1/4","2/3","2/2"] : ["1/2","2/4","3/4"];
       return makeQuestion(
         "fractions",
         "fraction.visual_identify",
