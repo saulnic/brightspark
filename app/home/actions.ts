@@ -12,23 +12,21 @@ export async function createLearner(formData: FormData) {
   }
 
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
+  const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  const { error } = await supabase.from("learners").insert({
-    account_id: user.id,
-    name,
-  });
+  const { data: learner, error } = await supabase
+    .from("learners")
+    .insert({ account_id: user.id, name })
+    .select("id")
+    .single();
 
-  if (error) {
+  if (error || !learner) {
     redirect("/home?error=create_learner_failed");
   }
 
   revalidatePath("/home");
-  redirect("/home");
+  redirect(`/learn/${learner.id}/avatar`);
 }
 
 export async function signOut() {

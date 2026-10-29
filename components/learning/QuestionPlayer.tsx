@@ -34,15 +34,15 @@ export function QuestionPlayer({
   const [startedAt, setStartedAt] = useState(Date.now());
   const [saving, setSaving] = useState(false);
   const [done, setDone] = useState(false);
+  const [stage, setStage] = useState(initialStage);
+  const [xp, setXp] = useState(initialXp);
 
   const question = useMemo(() => {
-    const q = generateQuestion(skillId, initialStage, seeds[index]);
+    const q = generateQuestion(skillId, stage, seeds[index]);
     const validation = validateQuestion(q);
     if (!validation.valid) throw new Error(validation.errors.join(" "));
     return q;
-  }, [skillId, initialStage, seeds, index, roundKey]);
-
-  const correctCount = answers.filter((a) => a.correct).length + (selected === question.correctChoiceId ? 1 : 0);
+  }, [skillId, stage, seeds, index, roundKey]);
 
   function choose(choiceId: string) {
     if (selected) return;
@@ -105,21 +105,23 @@ export function QuestionPlayer({
         );
       }
 
-      let xp = initialXp + correct - incorrect;
-      let stage = initialStage;
-      xp = Math.max(0, xp);
-      while (xp >= 30 && stage < 8) {
-        xp -= 30;
-        stage += 1;
+      let nextXp = Math.max(0, xp + correct - incorrect);
+      let nextStage = stage;
+      while (nextXp >= 30 && nextStage < 8) {
+        nextXp -= 30;
+        nextStage += 1;
       }
 
       await supabase.from("learner_skill_progress").upsert({
         learner_id: learnerId,
         skill_id: skillId,
-        stage,
-        xp,
+        stage: nextStage,
+        xp: nextXp,
         last_practised_at: new Date().toISOString(),
       });
+
+      setStage(nextStage);
+      setXp(nextXp);
     } finally {
       setSaving(false);
       setDone(true);
@@ -143,6 +145,7 @@ export function QuestionPlayer({
         <div className="finishEmoji">{score >= 4 ? "🌟" : score >= 3 ? "👏" : "💪"}</div>
         <h1>{score}/5 correct</h1>
         <p>{score === 5 ? "Perfect round!" : score >= 3 ? "Nice work!" : "Good practice — every round helps."}</p>
+        <div className="roundProgress">Stage {stage} · {xp}/30 XP</div>
         <div className="finishActions">
           <button className="primaryButton" onClick={playAgain}>Play again</button>
           <a className="secondaryButton" href={`/learn/${learnerId}`}>Back to topics</a>

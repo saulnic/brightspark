@@ -16,7 +16,7 @@ button { -webkit-tap-highlight-color: transparent; }
 .appShell { padding: 18px; max-width: 980px; margin: 0 auto; }
 
 .authCard, .heroCard, .createLearnerCard, .learnerCard, .learningHero,
-.topicCard, .questionCard, .finishCard {
+.topicCard, .questionCard, .finishCard, .avatarEditor, .dashboardCard, .statCard {
   background: white;
   box-shadow: 0 14px 38px rgba(37, 36, 58, 0.08);
 }
@@ -28,6 +28,7 @@ button { -webkit-tap-highlight-color: transparent; }
 h1,h2,p { margin-top:0; }
 h1 { margin-bottom:12px; font-size:clamp(2rem,8vw,3.5rem); line-height:1.05; }
 p { line-height:1.5; }
+small { color:#77718a; }
 .muted,.finePrint,.learnerCard span,.topicCopy span { color:#747284; }
 .finePrint { margin-top:18px; font-size:.82rem; }
 
@@ -52,13 +53,17 @@ p { line-height:1.5; }
 .learnerCard { display:grid; gap:8px; }
 .avatarPlaceholder { width:64px; height:64px; display:grid; place-items:center; border-radius:22px; background:#efeafd; font-size:30px; margin-bottom:8px; }
 .avatarPlaceholder.soft { color:#6f5bd3; background:#f5f2ff; }
-.profileChip { display:flex; align-items:center; gap:8px; padding:8px 12px; border-radius:999px; background:white; box-shadow:0 8px 24px rgba(37,36,58,.08); }
+.avatarSvg { display:block; flex:0 0 auto; }
+.profileChip { display:flex; align-items:center; gap:8px; padding:5px 10px 5px 6px; border-radius:999px; background:white; box-shadow:0 8px 24px rgba(37,36,58,.08); }
 
 .learningApp { max-width:760px; }
-.learningHero { border-radius:25px; padding:20px; display:flex; align-items:center; justify-content:space-between; gap:15px; margin-bottom:20px; }
-.learningHero h1 { font-size:2rem; margin-bottom:6px; }
+.learningHero { border-radius:25px; padding:18px; display:flex; align-items:center; justify-content:space-between; gap:15px; margin-bottom:12px; }
+.heroIdentity { display:flex; align-items:center; gap:13px; min-width:0; }
+.learningHero h1 { font-size:1.85rem; margin-bottom:4px; }
 .learningHero p { margin-bottom:0; }
 .starPill { padding:9px 12px; border-radius:999px; background:#fff7d6; font-weight:800; white-space:nowrap; }
+.utilityRow { display:flex; gap:9px; margin-bottom:18px; }
+.utilityRow a { flex:1; text-align:center; padding:10px 12px; border-radius:15px; background:#ece7ff; color:#5544b9; font-weight:800; font-size:.88rem; }
 
 .subjectSection { margin:22px 0 28px; }
 .subjectHeading { display:flex; align-items:center; justify-content:space-between; margin:0 4px 10px; }
@@ -90,13 +95,53 @@ p { line-height:1.5; }
 .finishCard { max-width:520px; margin:60px auto 0; border-radius:28px; padding:30px; text-align:center; }
 .finishEmoji { font-size:3rem; margin-bottom:8px; }
 .finishActions { display:flex; justify-content:center; gap:10px; flex-wrap:wrap; margin-top:18px; }
+.roundProgress { display:inline-block; padding:8px 12px; border-radius:999px; background:#f2effd; color:#5c4cc0; font-weight:800; }
+
+.avatarEditor { border-radius:28px; padding:22px; }
+.avatarPreview { display:flex; align-items:center; gap:22px; margin-bottom:20px; }
+.avatarPreview h1 { font-size:2rem; margin-bottom:6px; }
+.avatarPreview p:last-child { margin-bottom:0; }
+.avatarForm { display:grid; gap:15px; }
+.avatarOption { border:0; padding:0; margin:0; }
+.avatarOption legend { font-weight:800; margin-bottom:7px; }
+.optionChips { display:flex; gap:7px; flex-wrap:wrap; }
+.optionChip { border:2px solid #e5e1ee; background:white; border-radius:999px; padding:8px 11px; font-weight:700; color:#5d586b; }
+.optionChip.selected { border-color:#725ed3; background:#eee9ff; color:#5140af; }
+.avatarSave { margin-top:4px; }
+
+.statsGrid { display:grid; grid-template-columns:repeat(4,1fr); gap:9px; margin-bottom:12px; }
+.statCard { border-radius:18px; padding:14px; display:grid; gap:2px; }
+.statCard span { font-size:.78rem; color:#7a7488; }
+.statCard strong { font-size:1.65rem; }
+.statCard small { font-size:.7rem; }
+.dashboardCard { border-radius:24px; padding:18px; margin-bottom:12px; }
+.dashboardHeading { display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; gap:10px; }
+.dashboardHeading h2 { font-size:1.15rem; margin:0; }
+.dashboardHeading span { font-size:.78rem; color:#77718a; }
+.activityBars { display:grid; grid-template-columns:repeat(7,1fr); align-items:end; gap:8px; height:150px; }
+.activityDay { height:100%; display:grid; grid-template-rows:1fr auto auto; gap:3px; text-align:center; font-size:.73rem; }
+.barTrack { min-height:80px; display:flex; align-items:end; justify-content:center; background:#f4f1fb; border-radius:10px; overflow:hidden; }
+.barTrack div { width:100%; background:#765fd8; border-radius:10px 10px 0 0; min-height:6px; }
+.activityDay span { color:#817b8f; }
+.moduleStats { display:grid; gap:2px; }
+.moduleStatRow { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:11px 0; border-bottom:1px solid #f0edf5; }
+.moduleStatRow:last-child { border-bottom:0; }
+.moduleStatName { display:flex; align-items:center; gap:9px; min-width:0; }
+.moduleStatName > span { font-size:1.35rem; }
+.moduleStatName div { display:grid; gap:2px; min-width:0; }
+.moduleStatName strong { font-size:.9rem; }
+.moduleStatName small { font-size:.69rem; }
+.moduleStatNumbers { display:grid; grid-template-columns:auto auto; column-gap:6px; row-gap:1px; text-align:right; }
+.moduleStatNumbers strong { font-size:.84rem; }
+.moduleStatNumbers span { font-size:.67rem; color:#847e92; }
 
 @media (max-width:600px) {
   .appShell { padding:14px; }
   .authCard,.heroCard { padding:22px; }
   .topBar { align-items:flex-start; }
-  .learningHero { padding:17px; }
-  .learningHero h1 { font-size:1.8rem; }
+  .learningHero { padding:14px; }
+  .learningHero .avatarSvg { width:60px; height:60px; }
+  .learningHero h1 { font-size:1.62rem; }
   .topicGrid { grid-template-columns:1fr 1fr; gap:9px; }
   .topicCard { min-height:84px; padding:11px 10px; }
   .topicIcon { font-size:1.5rem; width:30px; flex-basis:30px; }
@@ -104,4 +149,7 @@ p { line-height:1.5; }
   .topicCopy span { font-size:.7rem; }
   .questionCard { padding:18px; }
   .answerButton { min-height:68px; padding:10px; }
+  .avatarPreview { gap:14px; }
+  .avatarPreview .avatarSvg { width:112px; height:112px; }
+  .statsGrid { grid-template-columns:repeat(2,1fr); }
 }
