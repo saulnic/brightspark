@@ -5,13 +5,17 @@ import type { ScienceLesson, ScienceScene } from "@/content/science-lessons";
 export function ScienceLessonCard({
   lesson,
   onStart,
+  lessonNumber,
+  lessonTotal,
 }: {
   lesson: ScienceLesson;
   onStart: () => void;
+  lessonNumber?: number;
+  lessonTotal?: number;
 }) {
   return (
     <section className="scienceLessonCard">
-      <div className="scienceLessonBadge">🔬 Learn first</div>
+      <div className="scienceLessonBadge">🔬 {lessonNumber && lessonTotal ? `Lesson ${lessonNumber} of ${lessonTotal}` : "Learn first"}</div>
       <h1>{lesson.title}</h1>
       <p className="scienceLessonIntro">{lesson.intro}</p>
       <ScienceSceneVisual scene={lesson.scene} large />

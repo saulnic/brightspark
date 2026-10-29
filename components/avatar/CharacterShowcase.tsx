@@ -68,6 +68,8 @@ export function CharacterShowcase({ config }: { config: AvatarConfig }) {
             <path d="M98 70 H106" stroke="#4a4359" strokeWidth="3"/>
           </>
         ) : null}
+        {config.activityItem === "headphones" ? <><path d="M67 65 Q69 31 102 25 Q136 31 138 65" fill="none" stroke="#57506b" strokeWidth="7" strokeLinecap="round"/><rect x="59" y="58" width="15" height="28" rx="7" fill="#393544"/><rect x="131" y="58" width="15" height="28" rx="7" fill="#393544"/></> : null}
+
         {config.eyewear === "sunglasses" ? (
           <>
             <rect x="70" y="61" width="29" height="19" rx="7" fill="#312f3a"/>
@@ -120,6 +122,13 @@ export function CharacterShowcase({ config }: { config: AvatarConfig }) {
         {config.bag === "backpack" ? (
           <rect x="56" y="129" width="27" height="58" rx="12" fill="#dcaa4e"/>
         ) : null}
+
+        {config.activityItem === "skateboard" ? <g transform="rotate(-10 158 245)"><rect x="151" y="198" width="17" height="94" rx="9" fill="#e78b45" stroke="#5d4b45" strokeWidth="3"/><circle cx="149" cy="215" r="5" fill="#34313b"/><circle cx="170" cy="273" r="5" fill="#34313b"/></g> : null}
+        {config.activityItem === "football" ? <g><circle cx="165" cy="214" r="19" fill="#f5f3ee" stroke="#4a4852" strokeWidth="3"/><path d="M151 203 L161 196 L174 202 L178 215 L168 229 L154 225 L146 214Z" fill="none" stroke="#4a4852" strokeWidth="2"/></g> : null}
+        {config.activityItem === "book" ? <g transform="rotate(-8 165 214)"><rect x="148" y="194" width="35" height="43" rx="4" fill="#e36f73" stroke="#62556a" strokeWidth="3"/><path d="M165 196 V235" stroke="#fff" strokeWidth="2"/></g> : null}
+        {config.activityItem === "art-set" ? <g><ellipse cx="165" cy="215" rx="24" ry="19" fill="#d5aa72" stroke="#66554a" strokeWidth="3"/><circle cx="155" cy="207" r="4" fill="#e25d5d"/><circle cx="166" cy="204" r="4" fill="#5d8ed7"/><circle cx="176" cy="211" r="4" fill="#e3bd4e"/><path d="M143 231 L184 181" stroke="#79543a" strokeWidth="4"/></g> : null}
+        {config.activityItem === "telescope" ? <g transform="rotate(-33 162 207)"><rect x="145" y="198" width="62" height="15" rx="7" fill="#5571a8" stroke="#3f4a61" strokeWidth="3"/><rect x="199" y="195" width="15" height="21" rx="5" fill="#d7b35a"/></g> : null}
+        {config.activityItem === "scooter" ? <g><path d="M17 291 H88" stroke="#586174" strokeWidth="9" strokeLinecap="round"/><circle cx="28" cy="307" r="10" fill="#353845"/><circle cx="82" cy="307" r="10" fill="#353845"/><path d="M78 291 L78 213 Q78 202 90 202 H102" fill="none" stroke="#586174" strokeWidth="7" strokeLinecap="round"/></g> : null}
       </g>
 
       {config.pet !== "none" ? (

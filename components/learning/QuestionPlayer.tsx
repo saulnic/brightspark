@@ -9,7 +9,7 @@ import { validateQuestion } from "@/learning/validate-question";
 import type { LearningQuestion } from "@/learning/types";
 import { ChoiceVisual, QuestionVisual } from "./QuestionVisual";
 import { ScienceLessonCard } from "./ScienceLessonCard";
-import { getScienceLesson, scienceQuestionAt } from "@/content/science-lessons";
+import { getScienceLesson, getScienceLessonCount, scienceQuestionAt } from "@/content/science-lessons";
 import { REWARDS, type Reward } from "@/content/rewards";
 
 const DEFAULT_ROUND_SIZE = 5;
@@ -45,6 +45,7 @@ export function QuestionPlayer({
   initialStage,
   initialXp,
   initialStars,
+  initialScienceLessonIndex,
   bonusRewardId,
   bonusTargetCorrect,
 }: {
@@ -54,6 +55,7 @@ export function QuestionPlayer({
   initialStage: number;
   initialXp: number;
   initialStars: number;
+  initialScienceLessonIndex?: number;
   bonusRewardId?: string;
   bonusTargetCorrect?: number;
 }) {
@@ -73,7 +75,9 @@ export function QuestionPlayer({
   const [earnedNow, setEarnedNow] = useState<Reward[]>([]);
   const [rewardPopupOpen, setRewardPopupOpen] = useState(false);
   const [restored, setRestored] = useState(false);
-  const scienceLesson = useMemo(() => getScienceLesson(skillId, stage), [skillId, stage]);
+  const [scienceLessonIndex, setScienceLessonIndex] = useState(initialScienceLessonIndex ?? 0);
+  const scienceLessonCount = getScienceLessonCount(skillId);
+  const scienceLesson = useMemo(() => getScienceLesson(skillId, scienceLessonIndex), [skillId, scienceLessonIndex]);
   const [lessonStarted, setLessonStarted] = useState(false);
   const roundSize = scienceLesson ? SCIENCE_ROUND_SIZE : DEFAULT_ROUND_SIZE;
   const storageKey = `brightspark:round:${learnerId}:${skillId}`;
@@ -82,8 +86,8 @@ export function QuestionPlayer({
     try {
       const raw = window.localStorage.getItem(storageKey);
       if (raw) {
-        const saved = JSON.parse(raw) as {version:number;stage:number;xp:number;index:number;answers:typeof answers;seeds:number[];lessonStarted:boolean};
-        if (saved.version===1 && saved.stage===initialStage && saved.xp===initialXp && Array.isArray(saved.seeds) && saved.seeds.length>=roundSize && saved.index>=0 && saved.index<roundSize) {
+        const saved = JSON.parse(raw) as {version:number;stage:number;xp:number;scienceLessonIndex?:number;index:number;answers:typeof answers;seeds:number[];lessonStarted:boolean};
+        if (saved.version===2 && saved.stage===initialStage && saved.xp===initialXp && (saved.scienceLessonIndex??scienceLessonIndex)===scienceLessonIndex && Array.isArray(saved.seeds) && saved.seeds.length>=roundSize && saved.index>=0 && saved.index<roundSize) {
           setSeeds(saved.seeds);
           setIndex(saved.index);
           setAnswers(Array.isArray(saved.answers)?saved.answers:[]);
@@ -94,11 +98,11 @@ export function QuestionPlayer({
       }
     } catch {}
     setRestored(true);
-  }, [storageKey, initialStage, initialXp, roundSize]);
+  }, [storageKey, initialStage, initialXp, roundSize, scienceLessonIndex]);
 
   function persistRound(nextIndex:number,nextAnswers:typeof answers,nextLessonStarted=lessonStarted) {
     try {
-      window.localStorage.setItem(storageKey, JSON.stringify({version:1,stage:initialStage,xp:initialXp,index:nextIndex,answers:nextAnswers,seeds,lessonStarted:nextLessonStarted}));
+      window.localStorage.setItem(storageKey, JSON.stringify({version:2,stage:initialStage,xp:initialXp,scienceLessonIndex,index:nextIndex,answers:nextAnswers,seeds,lessonStarted:nextLessonStarted}));
     } catch {}
   }
 
@@ -209,6 +213,16 @@ export function QuestionPlayer({
         last_practised_at: new Date().toISOString(),
       });
 
+      if (scienceLesson && scienceLessonCount > 0) {
+        const nextLessonIndex=(scienceLessonIndex+1)%scienceLessonCount;
+        await supabase.from("learner_science_progress").upsert({
+          learner_id:learnerId,
+          skill_id:skillId,
+          lesson_index:nextLessonIndex,
+          updated_at:new Date().toISOString(),
+        });
+      }
+
       if (bonusRewardId && correct >= (bonusTargetCorrect ?? Math.ceil(roundSize * 0.8))) {
         const { data: learnerRow } = await supabase.from("learners").select("avatar_config").eq("id", learnerId).single();
         const current = (learnerRow?.avatar_config ?? {}) as Record<string, unknown>;
@@ -234,6 +248,7 @@ export function QuestionPlayer({
   }
 
   function playAgain() {
+    if(scienceLesson && scienceLessonCount>0)setScienceLessonIndex((scienceLessonIndex+1)%scienceLessonCount);
     setSeeds(seedsForRound());
     setIndex(0);
     setAnswers([]);
@@ -252,7 +267,7 @@ export function QuestionPlayer({
   }
 
   if (scienceLesson && !lessonStarted && !done) {
-    return <ScienceLessonCard lesson={scienceLesson} onStart={() => { setLessonStarted(true); setStartedAt(Date.now()); persistRound(index, answers, true); }} />;
+    return <ScienceLessonCard lesson={scienceLesson} lessonNumber={scienceLessonIndex+1} lessonTotal={scienceLessonCount} onStart={() => { setLessonStarted(true); setStartedAt(Date.now()); persistRound(index, answers, true); }} />;
   }
 
   if (done) {
@@ -265,9 +280,9 @@ export function QuestionPlayer({
         <h1>{score}/{roundSize} correct</h1>
         <p>{score === roundSize ? "Perfect round!" : score >= Math.ceil(roundSize * 0.6) ? "Nice work!" : "Good practice — every round helps."}</p>
         {bonusUnlocked ? <div className="bonusUnlocked">🕶️ Bonus sunglasses unlocked!</div> : null}
-        <div className="roundProgress">Stage {stage} · {xp}/30 XP</div>
+        <div className="roundProgress">{scienceLesson ? `Lesson ${scienceLessonIndex+1} of ${scienceLessonCount} complete · ` : ""}Stage {stage} · {xp}/30 XP</div>
         <div className="finishActions">
-          <button className="primaryButton" onClick={playAgain}>Play again</button>
+          <button className="primaryButton" onClick={playAgain}>{scienceLesson ? "Next lesson" : "Play again"}</button>
           <button className="secondaryButton" onClick={()=>{router.push(`/learn/${learnerId}`);router.refresh();}}>Back to topics</button>
         </div>
       </section>
