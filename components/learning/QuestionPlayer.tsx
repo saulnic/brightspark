@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { generateQuestion } from "@/learning/generate-question";
 import { validateQuestion } from "@/learning/validate-question";
@@ -207,7 +208,7 @@ export function QuestionPlayer({
         <div className="roundProgress">Stage {stage} · {xp}/30 XP</div>
         <div className="finishActions">
           <button className="primaryButton" onClick={playAgain}>Play again</button>
-          <a className="secondaryButton" href={`/learn/${learnerId}`}>Back to topics</a>
+          <Link className="secondaryButton" href={`/learn/${learnerId}`} prefetch>Back to topics</Link>
         </div>
       </section>
     );
@@ -216,7 +217,7 @@ export function QuestionPlayer({
   return (
     <section className="questionShell">
       <header className="questionHeader">
-        <a href={`/learn/${learnerId}`} className="textButton">← Topics</a>
+        <Link href={`/learn/${learnerId}`} className="textButton" prefetch>← Topics</Link>
         <strong>{skillName}</strong>
         <span>{index + 1}/{roundSize}</span>
       </header>
