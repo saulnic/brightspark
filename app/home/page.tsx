@@ -1,5 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { Avatar } from "@/components/avatar/Avatar";
+import { normalizeAvatarConfig } from "@/content/avatar";
 import { createLearner, signOut } from "./actions";
 
 export const dynamic = "force-dynamic";
@@ -55,9 +57,7 @@ export default async function HomePage({
             href={`/learn/${learner.id}`}
             key={learner.id}
           >
-            <div className="avatarPlaceholder" aria-hidden="true">
-              🙂
-            </div>
+            <Avatar config={normalizeAvatarConfig(learner.avatar_config)} size={64} />
             <strong>{learner.name}</strong>
             <span>Continue learning →</span>
           </a>
@@ -69,8 +69,7 @@ export default async function HomePage({
           </div>
           <h2>{learners?.length ? "Add another learner" : "Create your learner"}</h2>
           <p>
-            Start with a name. The avatar creator is the next layer we&apos;ll
-            add to this profile.
+            Start with a name, then create their avatar before learning begins.
           </p>
           <form action={createLearner} className="authForm">
             <label htmlFor="name">Learner name</label>

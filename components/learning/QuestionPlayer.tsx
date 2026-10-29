@@ -13,6 +13,24 @@ function seedsForRound() {
   return Array.from({ length: ROUND_SIZE }, (_, i) => base + i * 7919);
 }
 
+function correctValue(question: LearningQuestion) {
+  return question.choices.find((choice) => choice.id === question.correctChoiceId)?.value;
+}
+
+function conceptSignature(question: LearningQuestion) {
+  const answer = String(correctValue(question) ?? "").toLowerCase();
+
+  // For shape/property questions, "6 sides" and "6 corners" are effectively
+  // the same concept when the answer is hexagon, so suppress by answer.
+  if (question.skillId === "shapes") return `shapes:${answer}`;
+
+  return `${question.objectiveId}:${answer}`;
+}
+
+function emitFeedback(type: "correct" | "incorrect" | "complete") {
+  window.dispatchEvent(new CustomEvent("brightspark:feedback", { detail: { type } }));
+}
+
 export function QuestionPlayer({
   learnerId,
   skillId,
@@ -38,15 +56,22 @@ export function QuestionPlayer({
   const [xp, setXp] = useState(initialXp);
 
   const question = useMemo(() => {
-    const q = generateQuestion(skillId, stage, seeds[index]);
-    const validation = validateQuestion(q);
+    const used = new Set(answers.map((answer) => conceptSignature(answer.question)));
+    let candidate = generateQuestion(skillId, stage, seeds[index]);
+
+    for (let retry = 0; retry < 30 && used.has(conceptSignature(candidate)); retry++) {
+      candidate = generateQuestion(skillId, stage, seeds[index] + (retry + 1) * 104729);
+    }
+
+    const validation = validateQuestion(candidate);
     if (!validation.valid) throw new Error(validation.errors.join(" "));
-    return q;
-  }, [skillId, stage, seeds, index, roundKey]);
+    return candidate;
+  }, [skillId, stage, seeds, index, roundKey, answers]);
 
   function choose(choiceId: string) {
     if (selected) return;
     setSelected(choiceId);
+    emitFeedback(choiceId === question.correctChoiceId ? "correct" : "incorrect");
   }
 
   async function next() {
@@ -122,6 +147,7 @@ export function QuestionPlayer({
 
       setStage(nextStage);
       setXp(nextXp);
+      emitFeedback("complete");
     } finally {
       setSaving(false);
       setDone(true);
