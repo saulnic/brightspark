@@ -365,7 +365,7 @@ export function generateQuestion(skillId: string, stage: number, seed: number): 
       prompt = `A bag has ${countLabel(red, "red counter")} and ${countLabel(blue, "blue counter")}. Which colour is more likely to be picked?`;
       correct = "Equally likely";
     } else {
-      prompt = `A bag has ${red} red and ${blue} blue counters. Which colour is more likely to be picked?`;
+      prompt = `A bag has ${countLabel(red, "red counter")} and ${countLabel(blue, "blue counter")}. Which colour is more likely to be picked?`;
       correct = red > blue ? "Red" : "Blue";
     }
     return makeQuestion("data", "chance.counters", difficulty, "counter_probability", prompt, textChoices(rng, correct, ["Red","Blue","Equally likely","Impossible","Certain"]), correct, seed, undefined, { kind: "counters", red, blue });
