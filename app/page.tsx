@@ -1,14 +1,17 @@
-export default function Home() {
-  return (
-    <main className="shell">
-      <section className="card">
-        <p className="eyebrow">BrightSpark</p>
-        <h1>Learning that grows with you.</h1>
-        <p>
-          The application foundation is in place. Learning modules, profiles,
-          avatars, progress and rewards will be built on this shell.
-        </p>
-      </section>
-    </main>
-  );
+import { redirect } from "next/navigation";
+import { createClient } from "@/lib/supabase/server";
+
+export const dynamic = "force-dynamic";
+
+export default async function RootPage() {
+  try {
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    redirect(user ? "/home" : "/login");
+  } catch {
+    redirect("/login");
+  }
 }
