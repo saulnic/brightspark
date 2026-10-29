@@ -84,7 +84,7 @@ function AvatarOption<T extends string>({
 }: {
   title: string;
   values: readonly T[];
-  selected: T;
+  selected: string;
   onPick: (value: T) => void;
 }) {
   return (

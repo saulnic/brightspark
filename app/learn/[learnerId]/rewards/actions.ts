@@ -26,6 +26,9 @@ export async function equipReward(formData: FormData) {
   if (stars < reward.stars) redirect(`/learn/${learnerId}/rewards`);
 
   const current = normalizeAvatarConfig(learner.avatar_config);
+  if (reward.category === "pet_accessory" && current.pet === "none") {
+    redirect(`/learn/${learnerId}/rewards`);
+  }
   const next = normalizeAvatarConfig({ ...current, ...reward.equip });
 
   await supabase.from("learners")
