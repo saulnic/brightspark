@@ -9,11 +9,12 @@ import { ChoiceVisual, QuestionVisual } from "./QuestionVisual";
 import { ScienceLessonCard } from "./ScienceLessonCard";
 import { getScienceLesson, scienceQuestionAt } from "@/content/science-lessons";
 
-const ROUND_SIZE = 5;
+const DEFAULT_ROUND_SIZE = 5;
+const SCIENCE_ROUND_SIZE = 10;
 
-function seedsForRound() {
+function seedsForRound(size = SCIENCE_ROUND_SIZE) {
   const base = Date.now() % 2_000_000_000;
-  return Array.from({ length: ROUND_SIZE }, (_, i) => base + i * 7919);
+  return Array.from({ length: size }, (_, i) => base + i * 7919);
 }
 
 function correctValue(question: LearningQuestion) {
@@ -62,6 +63,7 @@ export function QuestionPlayer({
   const [bonusUnlocked, setBonusUnlocked] = useState(false);
   const scienceLesson = useMemo(() => getScienceLesson(skillId, stage), [skillId, stage]);
   const [lessonStarted, setLessonStarted] = useState(false);
+  const roundSize = scienceLesson ? SCIENCE_ROUND_SIZE : DEFAULT_ROUND_SIZE;
 
   const question = useMemo(() => {
     if (scienceLesson) {
@@ -99,7 +101,7 @@ export function QuestionPlayer({
     };
     const nextAnswers = [...answers, attempt];
 
-    if (index < ROUND_SIZE - 1) {
+    if (index < roundSize - 1) {
       setAnswers(nextAnswers);
       setIndex(index + 1);
       setSelected(null);
@@ -111,14 +113,14 @@ export function QuestionPlayer({
     try {
       const supabase = createClient();
       const correct = nextAnswers.filter((a) => a.correct).length;
-      const incorrect = ROUND_SIZE - correct;
+      const incorrect = roundSize - correct;
       const { data: session } = await supabase
         .from("learning_sessions")
         .insert({
           learner_id: learnerId,
           skill_id: skillId,
           completed_at: new Date().toISOString(),
-          question_count: ROUND_SIZE,
+          question_count: roundSize,
           correct_count: correct,
           incorrect_count: incorrect,
         })
@@ -199,8 +201,8 @@ export function QuestionPlayer({
     return (
       <section className="finishCard">
         <div className="finishEmoji">{score >= 4 ? "🌟" : score >= 3 ? "👏" : "💪"}</div>
-        <h1>{score}/5 correct</h1>
-        <p>{score === 5 ? "Perfect round!" : score >= 3 ? "Nice work!" : "Good practice — every round helps."}</p>
+        <h1>{score}/{roundSize} correct</h1>
+        <p>{score === roundSize ? "Perfect round!" : score >= Math.ceil(roundSize * 0.6) ? "Nice work!" : "Good practice — every round helps."}</p>
         {bonusUnlocked ? <div className="bonusUnlocked">🕶️ Bonus sunglasses unlocked!</div> : null}
         <div className="roundProgress">Stage {stage} · {xp}/30 XP</div>
         <div className="finishActions">
@@ -216,9 +218,9 @@ export function QuestionPlayer({
       <header className="questionHeader">
         <a href={`/learn/${learnerId}`} className="textButton">← Topics</a>
         <strong>{skillName}</strong>
-        <span>{index + 1}/{ROUND_SIZE}</span>
+        <span>{index + 1}/{roundSize}</span>
       </header>
-      <div className="progressTrack"><div style={{ width: `${((index + 1) / ROUND_SIZE) * 100}%` }} /></div>
+      <div className="progressTrack"><div style={{ width: `${((index + 1) / roundSize) * 100}%` }} /></div>
 
       <section className="questionCard">
         <h1 className="questionPrompt">{question.prompt}</h1>
@@ -245,7 +247,7 @@ export function QuestionPlayer({
           <div className="feedbackRow">
             <strong>{selected === question.correctChoiceId ? "✅ Correct!" : "💡 Not quite"}</strong>
             <button className="primaryButton" onClick={next} disabled={saving}>
-              {index === ROUND_SIZE - 1 ? (saving ? "Saving…" : "Finish") : "Next"}
+              {index === roundSize - 1 ? (saving ? "Saving…" : "Finish") : "Next"}
             </button>
           </div>
         ) : null}

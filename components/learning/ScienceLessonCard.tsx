@@ -24,7 +24,7 @@ export function ScienceLessonCard({
         ))}
       </div>
       <button className="primaryButton scienceStartButton" onClick={onStart}>
-        Start the 5 questions →
+        Start the 10 questions →
       </button>
     </section>
   );
@@ -49,23 +49,27 @@ export function ScienceSceneVisual({
 
 function SolarVisual() {
   return (
-    <svg viewBox="0 0 520 230" role="img" aria-label="The Sun and eight planets in the Solar System">
-      <rect width="520" height="230" rx="24" fill="#17172d"/>
-      <g fill="#fff" opacity=".7">
-        <circle cx="38" cy="34" r="2"/><circle cx="172" cy="24" r="2"/><circle cx="335" cy="42" r="2"/>
-        <circle cx="465" cy="28" r="2"/><circle cx="424" cy="191" r="2"/><circle cx="235" cy="203" r="2"/>
+    <svg viewBox="0 0 520 320" role="img" aria-label="The Sun at the centre with eight planets travelling around it on orbital paths">
+      <rect width="520" height="320" rx="24" fill="#17172d"/>
+      <g fill="#fff" opacity=".72">
+        <circle cx="34" cy="32" r="2"/><circle cx="151" cy="24" r="2"/><circle cx="344" cy="32" r="2"/>
+        <circle cx="482" cy="45" r="2"/><circle cx="455" cy="280" r="2"/><circle cx="112" cy="282" r="2"/>
       </g>
-      <circle cx="58" cy="115" r="42" fill="#f8c94e"/>
-      <text x="58" y="175" textAnchor="middle" fill="#fff" fontSize="13" fontWeight="700">Sun</text>
-      <g>
-        <circle cx="125" cy="115" r="5" fill="#aaa7a2"/><circle cx="157" cy="115" r="8" fill="#d39b66"/>
-        <circle cx="199" cy="115" r="9" fill="#5e9ed5"/><circle cx="240" cy="115" r="7" fill="#c76c4c"/>
-        <circle cx="300" cy="115" r="21" fill="#d3a96f"/>
-        <circle cx="365" cy="115" r="17" fill="#d9b876"/>
-        <ellipse cx="365" cy="115" rx="29" ry="7" fill="none" stroke="#e1ca95" strokeWidth="4"/>
-        <circle cx="424" cy="115" r="13" fill="#7fc1c8"/><circle cx="474" cy="115" r="12" fill="#527dca"/>
+      <g fill="none" stroke="#737b9e" strokeWidth="1.5" opacity=".72">
+        <ellipse cx="260" cy="160" rx="62" ry="35"/><ellipse cx="260" cy="160" rx="89" ry="51"/>
+        <ellipse cx="260" cy="160" rx="118" ry="68"/><ellipse cx="260" cy="160" rx="148" ry="86"/>
+        <ellipse cx="260" cy="160" rx="178" ry="104"/><ellipse cx="260" cy="160" rx="205" ry="122"/>
+        <ellipse cx="260" cy="160" rx="226" ry="137"/><ellipse cx="260" cy="160" rx="246" ry="148"/>
       </g>
-      <text x="300" y="154" textAnchor="middle" fill="#d8d5e5" fontSize="11">8 planets orbit the Sun</text>
+      <circle cx="260" cy="160" r="40" fill="#f8c94e"/>
+      <circle cx="260" cy="160" r="48" fill="none" stroke="#f8c94e" strokeWidth="5" opacity=".18"/>
+      <circle cx="317" cy="144" r="5" fill="#aaa7a2"/><circle cx="200" cy="192" r="8" fill="#d39b66"/>
+      <circle cx="340" cy="206" r="9" fill="#5e9ed5"/><circle cx="158" cy="118" r="7" fill="#c76c4c"/>
+      <circle cx="390" cy="100" r="20" fill="#d3a96f"/>
+      <g transform="translate(112 220)"><ellipse cx="0" cy="0" rx="29" ry="7" fill="none" stroke="#e1ca95" strokeWidth="4"/><circle cx="0" cy="0" r="16" fill="#d9b876"/></g>
+      <circle cx="448" cy="220" r="13" fill="#7fc1c8"/><circle cx="72" cy="80" r="12" fill="#527dca"/>
+      <text x="260" y="166" textAnchor="middle" fill="#5b4511" fontSize="13" fontWeight="900">Sun</text>
+      <text x="260" y="303" textAnchor="middle" fill="#d8d5e5" fontSize="12">The planets orbit the Sun</text>
     </svg>
   );
 }

@@ -26,6 +26,7 @@ const LESSONS: Record<string, ScienceLesson[]> = {
       intro:"Our Solar System is the Sun and everything that travels around it.",
       facts:[
         {id:"sun",text:"The Sun is the star at the centre of our Solar System."},
+        {id:"orbit",text:"To orbit means to travel around another object in space. The planets orbit the Sun, and the Moon orbits Earth."},
         {id:"eight",text:"Eight planets orbit the Sun."},
         {id:"earth",text:"Earth is the third planet from the Sun and is where we live."},
         {id:"mercury",text:"Mercury is the closest planet to the Sun."},
@@ -33,6 +34,7 @@ const LESSONS: Record<string, ScienceLesson[]> = {
       ],
       questions:[
         {factId:"sun",prompt:"What is at the centre of our Solar System?",answer:"The Sun",distractors:["Earth","The Moon","Jupiter"],visual:{kind:"science_scene",scene:"solar",detail:"sun"}},
+        {factId:"orbit",prompt:"What does orbit mean?",answer:"To travel around another object in space",distractors:["To stop moving","To shine like a star","To spin in one place"]},
         {factId:"eight",prompt:"How many planets orbit the Sun?",answer:"Eight",distractors:["Seven","Nine","Ten"]},
         {factId:"earth",prompt:"Which planet do we live on?",answer:"Earth",distractors:["Mars","Venus","Mercury"],visual:{kind:"science_scene",scene:"solar",detail:"earth"}},
         {factId:"mercury",prompt:"Which planet is closest to the Sun?",answer:"Mercury",distractors:["Earth","Mars","Neptune"]},
@@ -272,24 +274,36 @@ export function getScienceLesson(skillId:string, stage:number):ScienceLesson|nul
 }
 
 export function scienceQuestionAt(lesson:ScienceLesson, index:number, seed:number):LearningQuestion {
-  const source=lesson.questions[index % lesson.questions.length];
+  const directCount=lesson.questions.length;
+  const source=lesson.questions[index % directCount];
+  const isReview=index>=directCount;
+  const fact=lesson.facts.find((item)=>item.id===source.factId);
+  let prompt=source.prompt;
+  if(isReview && fact) {
+    const lowerFact=fact.text.toLowerCase();
+    const lowerAnswer=source.answer.toLowerCase();
+    const at=lowerFact.indexOf(lowerAnswer);
+    prompt=at>=0
+      ? `Complete the fact: ${fact.text.slice(0,at)}_____${fact.text.slice(at+source.answer.length)}`
+      : `Which answer matches this fact? ${fact.text}`;
+  }
   const values=shuffle([source.answer,...source.distractors],seed+index*97);
   const choices:QuestionChoice[]=values.map((value,i)=>({id:`c${i}`,label:value,value}));
   const correct=choices.find((choice)=>choice.value===source.answer);
   if(!correct) throw new Error("Science lesson produced no correct answer.");
   return {
-    id:`${lesson.id}:${source.factId}`,
+    id:`${lesson.id}:${source.factId}:${isReview ? "review" : "direct"}`,
     skillId:lesson.skillId,
     objectiveId:source.factId,
     difficulty:lesson.stage,
     questionType:"science_lesson",
-    prompt:source.prompt,
+    prompt,
     visual:source.visual,
     choices,
     correctChoiceId:correct.id,
     explanation:lesson.facts.find((fact)=>fact.id===source.factId)?.text,
     seed,
-    contentVersion:"science-lesson-1",
+    contentVersion:"science-lesson-2",
   };
 }
 
@@ -297,7 +311,7 @@ export function validateScienceLesson(lesson:ScienceLesson) {
   const errors:string[]=[];
   const factIds=new Set(lesson.facts.map((fact)=>fact.id));
   const questionFacts=lesson.questions.map((question)=>question.factId);
-  if(lesson.questions.length!==5) errors.push(`${lesson.id}: lesson must contain exactly five questions`);
+  if(lesson.questions.length<5 || lesson.questions.length>7) errors.push(`${lesson.id}: lesson should teach five to seven core facts/questions`);
   if(new Set(questionFacts).size!==questionFacts.length) errors.push(`${lesson.id}: duplicate fact/question in lesson`);
   for(const question of lesson.questions) {
     if(!factIds.has(question.factId)) errors.push(`${lesson.id}: question references untaught fact ${question.factId}`);
