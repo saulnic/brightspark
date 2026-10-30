@@ -30,18 +30,61 @@ export function CharacterShowcase({config}:{config:AvatarConfig}){const skin=SKI
 {config.eyewear==="sunglasses"?<><rect x="70" y="61" width="29" height="19" rx="7" fill="#292731" stroke={COL[config.eyewearColour]} strokeWidth="4"/><rect x="105" y="61" width="29" height="19" rx="7" fill="#292731" stroke={COL[config.eyewearColour]} strokeWidth="4"/><path d="M99 67 H105" stroke={COL[config.eyewearColour]} strokeWidth="4"/></>:null}
 {config.audioAccessory==="headphones"?<><path d="M67 65 Q69 31 102 25 Q136 31 138 65" fill="none" stroke={COL[config.audioColour]} strokeWidth="7" strokeLinecap="round"/><rect x="59" y="58" width="15" height="28" rx="7" fill={COL[config.audioColour]}/><rect x="131" y="58" width="15" height="28" rx="7" fill={COL[config.audioColour]}/></>:null}
 <rect x="92" y="111" width="20" height="17" rx="8" fill={skin}/>
-<path d="M73 128 Q102 113 131 128 L126 194 Q102 203 78 194Z" fill={COL[config.topColour]}/>
+{config.outfit==="dress"?<>
+  <path d="M73 128 Q102 113 131 128 L130 181 Q102 190 74 181Z" fill={COL[config.outfitColour]} stroke="#5a5669" strokeWidth="2.5"/>
+  <path d="M79 128 Q102 142 125 128" fill="none" stroke="#fff" strokeOpacity=".45" strokeWidth="3"/>
+</>:<path d="M73 128 Q102 113 131 128 L126 194 Q102 203 78 194Z" fill={COL[config.topColour]} stroke="#5a5669" strokeWidth="2.5"/>}
 <path d="M75 137 Q56 150 50 177" stroke={skin} strokeWidth="15" fill="none" strokeLinecap="round"/><path d="M50 177 Q47 194 55 203" stroke={skin} strokeWidth="15" fill="none" strokeLinecap="round"/><circle cx="56" cy="205" r="9" fill={skin}/>
 <path d="M129 137 Q148 150 154 177" stroke={skin} strokeWidth="15" fill="none" strokeLinecap="round"/><path d="M154 177 Q157 194 149 203" stroke={skin} strokeWidth="15" fill="none" strokeLinecap="round"/><circle cx="148" cy="205" r="9" fill={skin}/>
-{config.outfit==="dress"?<><path d="M76 165 H128 L142 242 Q102 253 62 242Z" fill={COL[config.outfitColour]}/><Marks kind={config.outfitPattern} x={66} y={177} w={72} h={58}/></>:<>
-{config.bottom==="skirt"?<><path d="M77 190 H127 L139 232 Q102 243 65 232Z" fill={COL[config.bottomColour]}/><Marks kind={config.bottomPattern} x={68} y={194} w={67} h={34}/></>:null}
-{config.bottom==="shorts"?<><path d="M74 190 H130 L126 232 H107 L102 211 L97 232 H78Z" fill={COL[config.bottomColour]}/><Marks kind={config.bottomPattern} x={78} y={194} w={48} h={32}/></>:null}
-{config.bottom==="trousers"?<><path d="M76 190 H128 L122 279 H105 L102 218 L99 279 H82Z" fill={COL[config.bottomColour]}/><Marks kind={config.bottomPattern} x={81} y={194} w={42} h={75}/></>:null}</>}
+{config.outfit==="dress"?<>
+  <path d="M77 174 Q102 182 127 174 L145 239 Q129 251 102 251 Q75 251 59 239Z" fill={COL[config.outfitColour]} stroke="#5a5669" strokeWidth="2.5"/>
+  <path d="M77 178 Q102 187 127 178" fill="none" stroke="#fff" strokeOpacity=".35" strokeWidth="2"/>
+  <path d="M79 184 L69 237 M94 185 L88 246 M110 185 L116 246 M125 184 L136 237" stroke="#fff" strokeOpacity=".24" strokeWidth="2.5"/>
+  <Marks kind={config.outfitPattern} x={67} y={184} w={70} h={50}/>
+</>:<>
+{config.bottom==="skirt"?<>
+  <path d="M77 190 Q102 197 127 190 L138 232 Q122 241 102 241 Q82 241 66 232Z" fill={COL[config.bottomColour]} stroke="#5a5669" strokeWidth="2.5"/>
+  <path d="M82 194 L76 228 M95 195 L92 235 M109 195 L112 235 M122 194 L128 228" stroke="#fff" strokeOpacity=".22" strokeWidth="2"/>
+  <Marks kind={config.bottomPattern} x={70} y={196} w={64} h={32}/>
+</>:null}
+{config.bottom==="shorts"?<>
+  <path d="M74 190 H130 L127 229 Q117 233 107 229 L102 209 L97 229 Q87 233 77 229Z" fill={COL[config.bottomColour]} stroke="#5a5669" strokeWidth="2.5"/>
+  <Marks kind={config.bottomPattern} x={79} y={195} w={46} h={28}/>
+</>:null}
+{config.bottom==="trousers"?<>
+  <path d="M76 190 H128 L123 279 H106 L102 218 L98 279 H81Z" fill={COL[config.bottomColour]} stroke="#5a5669" strokeWidth="2.5"/>
+  <path d="M102 198 V219" stroke="#fff" strokeOpacity=".25" strokeWidth="2"/>
+  <Marks kind={config.bottomPattern} x={82} y={196} w={40} h={72}/>
+</>:null}</>}
 {config.bottom!=="trousers"||config.outfit==="dress"?<><path d="M83 231 Q82 257 80 282" stroke={skin} strokeWidth="17" fill="none" strokeLinecap="round"/><path d="M121 231 Q122 257 124 282" stroke={skin} strokeWidth="17" fill="none" strokeLinecap="round"/></>:null}
-{config.shoes==="long-boots"?<><path d="M64 248 H91 L92 293 H56 Q52 286 59 279Z" fill={COL[config.shoesColour]} stroke="#5a5669" strokeWidth="3"/><path d="M112 248 H139 L147 293 H110 Q106 286 113 279Z" fill={COL[config.shoesColour]} stroke="#5a5669" strokeWidth="3"/></>:config.shoes==="ankle-boots"?<><path d="M62 270 H91 L92 294 H55 Q51 287 58 280Z" fill={COL[config.shoesColour]} stroke="#5a5669" strokeWidth="3"/><path d="M113 270 H142 L147 294 H110 Q106 287 113 280Z" fill={COL[config.shoesColour]} stroke="#5a5669" strokeWidth="3"/></>:<><path d="M57 282 Q75 273 92 282 Q95 289 88 295 Q69 299 55 292 Q52 287 57 282Z" fill={COL[config.shoesColour]} stroke="#5a5669" strokeWidth={config.shoes==="skate-shoes"?5:3}/><path d="M112 282 Q130 273 147 282 Q150 289 143 295 Q124 299 110 292 Q107 287 112 282Z" fill={COL[config.shoesColour]} stroke="#5a5669" strokeWidth={config.shoes==="skate-shoes"?5:3}/></>}
+{config.shoes==="long-boots"?<>
+  <path d="M66 247 Q78 243 90 249 L91 289 Q80 296 57 292 Q53 286 59 280 L64 268Z" fill={COL[config.shoesColour]} stroke="#4d4957" strokeWidth="3"/>
+  <path d="M114 247 Q126 243 138 249 L145 289 Q134 296 111 292 Q107 286 113 280 L112 268Z" fill={COL[config.shoesColour]} stroke="#4d4957" strokeWidth="3"/>
+  <path d="M60 285 Q75 290 91 285 M112 285 Q128 290 144 285" fill="none" stroke="#fff" strokeOpacity=".45" strokeWidth="3"/>
+</>:config.shoes==="ankle-boots"?<>
+  <path d="M63 269 Q77 265 90 272 L92 290 Q82 297 56 292 Q52 286 58 280Z" fill={COL[config.shoesColour]} stroke="#4d4957" strokeWidth="3"/>
+  <path d="M114 269 Q128 265 141 272 L147 290 Q137 297 111 292 Q107 286 113 280Z" fill={COL[config.shoesColour]} stroke="#4d4957" strokeWidth="3"/>
+  <path d="M62 279 H89 M114 279 H142" stroke="#fff" strokeOpacity=".35" strokeWidth="2.5"/>
+</>:<>
+  <g>
+    <path d="M57 281 Q66 273 79 274 Q89 275 96 283 L94 291 Q83 297 56 294 Q51 289 57 281Z" fill={COL[config.shoesColour]} stroke="#4d4957" strokeWidth="3"/>
+    <path d="M111 281 Q120 273 133 274 Q143 275 150 283 L148 291 Q137 297 110 294 Q105 289 111 281Z" fill={COL[config.shoesColour]} stroke="#4d4957" strokeWidth="3"/>
+    <path d="M56 289 Q75 294 94 289 M110 289 Q129 294 148 289" fill="none" stroke="#fff" strokeWidth="4" strokeLinecap="round"/>
+    <path d="M66 281 L84 285 M121 281 L139 285" stroke={config.shoesColour==="white"?"#8d8993":"#fff"} strokeOpacity=".85" strokeWidth="2"/>
+    {config.shoes==="skate-shoes"?<><path d="M61 276 Q75 270 90 278" fill="none" stroke="#34313b" strokeWidth="3"/><path d="M116 276 Q130 270 145 278" fill="none" stroke="#34313b" strokeWidth="3"/></>:null}
+  </g>
+</>}
 {config.bag==="handbag"?<><path d="M145 154 Q166 135 177 157" fill="none" stroke={COL[config.bagColour]} strokeWidth="5"/><rect x="148" y="155" width="35" height="32" rx="8" fill={COL[config.bagColour]}/></>:null}
 {config.bag==="backpack"?<rect x="56" y="129" width="27" height="58" rx="12" fill={COL[config.bagColour]}/>:null}
-{config.activityItem==="skateboard"?<g><path d="M164 188 Q174 185 177 198 L181 278 Q181 292 168 294 Q157 295 155 282 L151 203 Q150 191 164 188Z" fill={item} stroke="#4e4750" strokeWidth="3"/><path d="M155 217 H176 M158 267 H179" stroke="#6b6872" strokeWidth="3"/><circle cx="152" cy="218" r="6" fill="#34313b"/><circle cx="179" cy="216" r="6" fill="#34313b"/><circle cx="156" cy="269" r="6" fill="#34313b"/><circle cx="182" cy="267" r="6" fill="#34313b"/><circle cx="158" cy="207" r="8" fill={skin}/></g>:null}
+{config.activityItem==="skateboard"?<g transform="rotate(-4 171 242)">
+  <path d="M163 186 Q168 180 176 184 Q182 188 181 198 L183 279 Q184 289 176 296 Q168 301 160 296 Q154 291 155 281 L153 199 Q152 191 163 186Z" fill={item} stroke="#4d4957" strokeWidth="3"/>
+  <path d="M160 194 Q168 190 176 194 M160 286 Q169 291 179 285" fill="none" stroke="#fff" strokeOpacity=".45" strokeWidth="2.5"/>
+  <rect x="151" y="213" width="32" height="5" rx="2.5" fill="#77727d"/>
+  <rect x="154" y="267" width="32" height="5" rx="2.5" fill="#77727d"/>
+  <circle cx="154" cy="220" r="5.5" fill="#34313b"/><circle cx="181" cy="220" r="5.5" fill="#34313b"/>
+  <circle cx="157" cy="275" r="5.5" fill="#34313b"/><circle cx="184" cy="275" r="5.5" fill="#34313b"/>
+  <path d="M153 207 Q158 200 166 204" fill="none" stroke={skin} strokeWidth="11" strokeLinecap="round"/>
+</g>:null}
 {config.activityItem==="australian-football"?<g transform="rotate(-18 166 214)"><ellipse cx="166" cy="214" rx="23" ry="14" fill={item} stroke="#5c4540" strokeWidth="3"/><path d="M155 214 H177 M164 208 V220 M168 208 V220" stroke="#f7f2e9" strokeWidth="2"/></g>:null}
 {config.activityItem==="soccer-ball"?<g><circle cx="166" cy="214" r="20" fill="#f7f5f0" stroke="#4a4852" strokeWidth="3"/><path d="M158 206 l8-6 9 7-3 10-11 1-6-8Z" fill={config.activityColour==="white"?"#34313b":item}/></g>:null}
 {config.activityItem==="netball"?<g><circle cx="166" cy="214" r="20" fill={item} stroke="#63606a" strokeWidth="3"/><path d="M148 210 Q166 200 184 210 M151 222 Q166 213 181 222 M166 194 V234" fill="none" stroke="#8d8993" strokeWidth="2"/></g>:null}
@@ -53,4 +96,32 @@ export function CharacterShowcase({config}:{config:AvatarConfig}){const skin=SKI
 </g>
 {config.pet!=="none"?<Pet type={config.pet} head={config.petHeadAccessory} headColour={config.petHeadColour} neck={config.petNeckAccessory} neckColour={config.petNeckColour}/>:null}
 </svg>}
-function Pet({type,head,headColour,neck,neckColour}:{type:"cat"|"dog";head:"none"|"bow";headColour:RewardColour;neck:"none"|"collar";neckColour:RewardColour}){const fur=type==="cat"?"#d9a06d":"#b9875f";return <g transform="translate(228 214)"><ellipse cx="45" cy="90" rx="40" ry="45" fill={fur} stroke="#6e513f" strokeWidth="4"/><circle cx="45" cy="40" r="35" fill={fur} stroke="#6e513f" strokeWidth="4"/>{type==="cat"?<><path d="M17 18 L24 -8 L39 12Z" fill={fur} stroke="#6e513f" strokeWidth="4"/><path d="M73 18 L66 -8 L51 12Z" fill={fur} stroke="#6e513f" strokeWidth="4"/></>:<><ellipse cx="12" cy="30" rx="11" ry="23" fill="#8d644b"/><ellipse cx="78" cy="30" rx="11" ry="23" fill="#8d644b"/></>}<circle cx="33" cy="39" r="4" fill="#302a2a"/><circle cx="57" cy="39" r="4" fill="#302a2a"/><circle cx="45" cy="51" r="5" fill="#302a2a"/>{neck==="collar"?<rect x="18" y="65" width="54" height="9" rx="4" fill={COL[neckColour]}/>:null}{head==="bow"?<><path d="M45 7 Q24 -5 25 16 Q27 29 45 19Z" fill={COL[headColour]}/><path d="M45 7 Q66 -5 65 16 Q63 29 45 19Z" fill={COL[headColour]}/><circle cx="45" cy="13" r="7" fill={COL[headColour]}/></>:null}</g>}
+function Pet({type,head,headColour,neck,neckColour}:{type:"cat"|"dog";head:"none"|"bow";headColour:RewardColour;neck:"none"|"collar";neckColour:RewardColour}){
+ const fur=type==="cat"?"#d9a06d":"#b9875f",dark=type==="cat"?"#8f6243":"#7a523e",cream="#f4d3ad";
+ return <g transform="translate(225 224)">
+  <ellipse cx="48" cy="91" rx="39" ry="9" fill="#ded8ea" opacity=".65"/>
+  {type==="cat"?<>
+    <path d="M17 78 Q6 66 13 49 Q18 38 29 42" fill="none" stroke={dark} strokeWidth="7" strokeLinecap="round"/>
+    <ellipse cx="47" cy="69" rx="32" ry="28" fill={fur} stroke={dark} strokeWidth="3"/>
+    <circle cx="47" cy="34" r="26" fill={fur} stroke={dark} strokeWidth="3"/>
+    <path d="M27 18 L31 -5 L43 12Z M67 18 L63 -5 L51 12Z" fill={fur} stroke={dark} strokeWidth="3" strokeLinejoin="round"/>
+    <path d="M31 7 L33 -1 L39 11 M63 7 L61 -1 L55 11" fill="#efa5a5" opacity=".75"/>
+    <ellipse cx="47" cy="44" rx="12" ry="9" fill={cream}/>
+    <circle cx="38" cy="32" r="3.5" fill="#2f2b2b"/><circle cx="56" cy="32" r="3.5" fill="#2f2b2b"/>
+    <path d="M43 41 Q47 45 51 41 Q47 48 43 41Z" fill="#7b4949"/>
+    <path d="M31 43 H18 M32 48 L19 52 M63 43 H76 M62 48 L75 52" stroke={dark} strokeWidth="1.8" strokeLinecap="round"/>
+    <path d="M25 81 Q29 91 36 89 M58 89 Q65 91 69 81" fill="none" stroke={dark} strokeWidth="3" strokeLinecap="round"/>
+  </>:<>
+    <ellipse cx="47" cy="70" rx="34" ry="29" fill={fur} stroke={dark} strokeWidth="3"/>
+    <circle cx="47" cy="34" r="27" fill={fur} stroke={dark} strokeWidth="3"/>
+    <ellipse cx="22" cy="31" rx="10" ry="21" fill={dark}/><ellipse cx="72" cy="31" rx="10" ry="21" fill={dark}/>
+    <ellipse cx="47" cy="45" rx="14" ry="11" fill={cream}/>
+    <circle cx="38" cy="31" r="3.5" fill="#2f2b2b"/><circle cx="56" cy="31" r="3.5" fill="#2f2b2b"/>
+    <circle cx="47" cy="42" r="4.5" fill="#2f2b2b"/><path d="M43 49 Q47 54 51 49" fill="none" stroke="#7b4949" strokeWidth="2"/>
+    <path d="M17 76 Q4 70 6 58" fill="none" stroke={dark} strokeWidth="7" strokeLinecap="round"/>
+    <path d="M25 84 Q29 92 36 89 M58 89 Q65 92 69 84" fill="none" stroke={dark} strokeWidth="3" strokeLinecap="round"/>
+  </>}
+  {neck==="collar"?<><path d="M23 54 Q47 62 71 54" fill="none" stroke={COL[neckColour]} strokeWidth="7"/><circle cx="47" cy="59" r="4" fill="#e2b63f"/></>:null}
+  {head==="bow"?<g transform="translate(47 11)"><path d="M0 2 Q-18 -9 -18 7 Q-16 18 0 10Z" fill={COL[headColour]}/><path d="M0 2 Q18 -9 18 7 Q16 18 0 10Z" fill={COL[headColour]}/><circle cx="0" cy="7" r="6" fill={COL[headColour]}/></g>:null}
+ </g>
+}
