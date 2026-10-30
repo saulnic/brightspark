@@ -174,17 +174,17 @@ function HeldItem({config}:{config:AvatarConfig}) {
   if(config.activityItem==="australian-football") return <g>
     <g transform="rotate(-11 102 188)"><ellipse cx="102" cy="188" rx="28" ry="17" fill={item} stroke="#5c4540" strokeWidth="3"/><path d="M88 188 H116 M99 181 V195 M105 181 V195" stroke="#f7f2e9" strokeWidth="2.2"/></g>
     <circle cx="82" cy="190" r="8" fill={skin}/><circle cx="121" cy="193" r="8" fill={skin}/>
-  </>;
+  </g>;
   if(config.activityItem==="soccer-ball") return <g>
     <circle cx="103" cy="190" r="23" fill="#f7f5f0" stroke="#4a4852" strokeWidth="3"/>
     <path d="M95 181 l8-7 10 8-4 11-12 1-6-9Z" fill={config.activityColour==="white"?"#34313b":item}/>
     <circle cx="81" cy="190" r="8" fill={skin}/><circle cx="124" cy="192" r="8" fill={skin}/>
-  </>;
+  </g>;
   if(config.activityItem==="netball") return <g>
     <circle cx="103" cy="190" r="23" fill={item} stroke="#63606a" strokeWidth="3"/>
     <path d="M82 185 Q103 174 124 185 M85 199 Q103 188 121 199 M103 168 V212" fill="none" stroke="#8d8993" strokeWidth="2"/>
     <circle cx="81" cy="190" r="8" fill={skin}/><circle cx="124" cy="192" r="8" fill={skin}/>
-  </>;
+  </g>;
   if(config.activityItem==="book") return <g transform="rotate(-5 103 188)">
     <path d="M77 165 Q91 160 103 168 V211 Q91 203 77 207Z" fill={item} stroke="#62556a" strokeWidth="3"/>
     <path d="M103 168 Q116 160 130 165 V207 Q116 203 103 211Z" fill={item} stroke="#62556a" strokeWidth="3"/>
