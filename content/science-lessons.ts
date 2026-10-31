@@ -10,6 +10,7 @@ export type ScienceLesson = {
   intro: string;
   facts: { id: string; text: string }[];
   scene: ScienceScene;
+  visualDetail?: string;
   questions: {
     factId: string;
     prompt: string;
@@ -41,20 +42,22 @@ const LESSONS: Record<string, ScienceLesson[]> = {
       ],
     },
     {
-      id:"solar-2-structure", skillId:"solar", stage:2, title:"How the Solar System is organised", scene:"solar",
-      intro:"The planets form groups, with an asteroid belt separating the inner rocky planets from the giant outer planets.",
+      id:"solar-2-structure", skillId:"solar", stage:2, title:"How the Solar System is organised", scene:"solar", visualDetail:"structure",
+      intro:"The eight planets form clear groups: four inner rocky planets, the asteroid belt, then four outer giant planets.",
       facts:[
         {id:"inner",text:"Mercury, Venus, Earth and Mars are the four inner rocky planets."},
         {id:"belt",text:"The main asteroid belt lies between Mars and Jupiter."},
         {id:"outer",text:"Jupiter, Saturn, Uranus and Neptune are the four outer giant planets."},
-        {id:"gasice",text:"Jupiter and Saturn are gas giants, while Uranus and Neptune are ice giants."},
+        {id:"gas",text:"Jupiter and Saturn are gas giants."},
+        {id:"ice",text:"Uranus and Neptune are ice giants."},
         {id:"rings",text:"All four giant planets have rings, although Saturn's are the easiest to see."},
       ],
       questions:[
-        {factId:"inner",prompt:"Which planets are the inner rocky planets?",reviewPrompt:"Which group is made of the four small rocky planets nearest the Sun?",answer:"Mercury, Venus, Earth and Mars",distractors:["Jupiter, Saturn, Uranus and Neptune","Earth, Mars, Jupiter and Saturn","Venus, Earth, Uranus and Neptune"]},
-        {factId:"belt",prompt:"Where is the main asteroid belt?",reviewPrompt:"What lies between the orbit of Mars and the orbit of Jupiter?",answer:"Between Mars and Jupiter",distractors:["Between Earth and Mars","Beyond Neptune only","Between Mercury and Venus"]},
+        {factId:"inner",prompt:"Which planets are the four inner rocky planets?",reviewPrompt:"Which four rocky planets are closest to the Sun?",answer:"Mercury, Venus, Earth and Mars",distractors:["Jupiter, Saturn, Uranus and Neptune","Earth, Mars, Jupiter and Saturn","Venus, Earth, Uranus and Neptune"]},
+        {factId:"belt",prompt:"What lies between the orbit of Mars and the orbit of Jupiter?",reviewPrompt:"What separates the inner rocky planets from the outer giant planets?",answer:"The asteroid belt",distractors:["The Moon","The rings of Saturn","The Kuiper Belt"]},
         {factId:"outer",prompt:"Which are the four outer giant planets?",reviewPrompt:"Which four planets make up the giant outer group?",answer:"Jupiter, Saturn, Uranus and Neptune",distractors:["Mercury, Venus, Earth and Mars","Mars, Jupiter, Saturn and Earth","Venus, Saturn, Uranus and Mars"]},
-        {factId:"gasice",prompt:"Which planets are the ice giants?",reviewPrompt:"Uranus and Neptune belong to which type of giant planet?",answer:"Uranus and Neptune",distractors:["Jupiter and Saturn","Earth and Mars","Mercury and Venus"]},
+        {factId:"gas",prompt:"Which planets are the gas giants?",reviewPrompt:"Which pair are the gas giants?",answer:"Jupiter and Saturn",distractors:["Uranus and Neptune","Earth and Mars","Mercury and Venus"]},
+        {factId:"ice",prompt:"What type of giant planets are Uranus and Neptune?",reviewPrompt:"Uranus and Neptune are known as what kind of giants?",answer:"Ice giants",distractors:["Gas giants","Rocky planets","Dwarf planets"]},
         {factId:"rings",prompt:"Which giant planet has the most obvious rings?",reviewPrompt:"All four giant planets have rings. Which planet's rings are easiest to see?",answer:"Saturn",distractors:["Jupiter","Uranus","Neptune"]},
       ],
     },
@@ -477,12 +480,12 @@ export function scienceQuestionAt(lesson:ScienceLesson, index:number, seed:numbe
     difficulty:lesson.stage,
     questionType:"science_lesson",
     prompt,
-    visual:source.visual ?? {kind:"science_scene",scene:lesson.scene},
+    visual:source.visual ?? {kind:"science_scene",scene:lesson.scene,detail:lesson.visualDetail},
     choices,
     correctChoiceId:correct.id,
     explanation:lesson.facts.find((fact)=>fact.id===source.factId)?.text,
     seed,
-    contentVersion:"science-lesson-4",
+    contentVersion:"science-lesson-5",
   };
 }
 

@@ -214,9 +214,14 @@ function HeldItem({config}:{config:AvatarConfig}) {
     <circle cx="156" cy="210" r="8" fill={skin}/>
   </g>;
   if(config.activityItem==="scooter") return <g>
-    <path d="M17 291 H88" stroke={item} strokeWidth="9" strokeLinecap="round"/><circle cx="28" cy="307" r="10" fill="#353845"/><circle cx="82" cy="307" r="10" fill="#353845"/>
-    <path d="M78 291 L78 211 Q78 199 90 199 H108" fill="none" stroke={item} strokeWidth="7" strokeLinecap="round"/>
-    <circle cx="91" cy="199" r="8" fill={skin}/>
+    <path d="M151 284 Q170 288 199 284 L205 291 Q176 297 148 291Z" fill={item} stroke="#4d4957" strokeWidth="3"/>
+    <circle cx="154" cy="302" r="10" fill="#34313b"/><circle cx="201" cy="302" r="10" fill="#34313b"/>
+    <circle cx="154" cy="302" r="4" fill="#8f93a0"/><circle cx="201" cy="302" r="4" fill="#8f93a0"/>
+    <path d="M193 286 L180 198" fill="none" stroke={item} strokeWidth="7" strokeLinecap="round"/>
+    <path d="M164 196 H196" fill="none" stroke="#4d4957" strokeWidth="7" strokeLinecap="round"/>
+    <path d="M166 196 H193" fill="none" stroke={item} strokeWidth="4" strokeLinecap="round"/>
+    <path d="M187 284 L195 284" stroke="#fff" strokeOpacity=".45" strokeWidth="3" strokeLinecap="round"/>
+    <circle cx="177" cy="193" r="8" fill={skin}/>
   </g>;
   return null;
 }

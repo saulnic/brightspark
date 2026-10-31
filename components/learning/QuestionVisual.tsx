@@ -35,7 +35,7 @@ export function QuestionVisual({ question }: { question: LearningQuestion }) {
     const scene = String(visual.scene ?? "") as "solar" | "volcano" | "dinosaur" | "habitat";
     return (
       <div className="visualStage scienceStage">
-        <ScienceSceneVisual scene={scene} />
+        <ScienceSceneVisual scene={scene} detail={String(visual.detail ?? "") || undefined} />
       </div>
     );
   }

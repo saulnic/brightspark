@@ -18,7 +18,7 @@ export function ScienceLessonCard({
       <div className="scienceLessonBadge">🔬 {lessonNumber && lessonTotal ? `Lesson ${lessonNumber} of ${lessonTotal}` : "Learn first"}</div>
       <h1>{lesson.title}</h1>
       <p className="scienceLessonIntro">{lesson.intro}</p>
-      <ScienceSceneVisual scene={lesson.scene} large />
+      <ScienceSceneVisual scene={lesson.scene} detail={lesson.visualDetail} large />
       <div className="scienceFacts">
         {lesson.facts.map((fact, index) => (
           <div className="scienceFact" key={fact.id}>
@@ -36,14 +36,16 @@ export function ScienceLessonCard({
 
 export function ScienceSceneVisual({
   scene,
+  detail,
   large = false,
 }: {
   scene: ScienceScene;
+  detail?: string;
   large?: boolean;
 }) {
   return (
     <div className={large ? "scienceScene scienceSceneLarge" : "scienceScene"}>
-      {scene === "solar" ? <SolarVisual /> : null}
+      {scene === "solar" ? (detail === "structure" ? <SolarStructureVisual /> : <SolarVisual />) : null}
       {scene === "volcano" ? <VolcanoVisual /> : null}
       {scene === "dinosaur" ? <DinosaurVisual /> : null}
       {scene === "habitat" ? <HabitatVisual /> : null}
@@ -74,6 +76,49 @@ function SolarVisual() {
       <circle cx="448" cy="220" r="13" fill="#7fc1c8"/><circle cx="72" cy="80" r="12" fill="#527dca"/>
       <text x="260" y="166" textAnchor="middle" fill="#5b4511" fontSize="13" fontWeight="900">Sun</text>
       <text x="260" y="303" textAnchor="middle" fill="#d8d5e5" fontSize="12">The planets orbit the Sun</text>
+    </svg>
+  );
+}
+
+function SolarStructureVisual() {
+  const planets=[
+    {name:"Mercury",x:92,r:6,c:"#aaa7a2"},
+    {name:"Venus",x:137,r:10,c:"#d39b66"},
+    {name:"Earth",x:185,r:11,c:"#5e9ed5"},
+    {name:"Mars",x:232,r:8,c:"#c76c4c"},
+    {name:"Jupiter",x:326,r:24,c:"#d3a96f"},
+    {name:"Saturn",x:382,r:19,c:"#d9b876"},
+    {name:"Uranus",x:438,r:14,c:"#7fc1c8"},
+    {name:"Neptune",x:484,r:13,c:"#527dca"},
+  ];
+  return (
+    <svg viewBox="0 0 520 270" role="img" aria-label="Solar System arranged in order showing the inner rocky planets, asteroid belt, gas giants and ice giants">
+      <rect width="520" height="270" rx="24" fill="#17172d"/>
+      <rect x="70" y="34" width="188" height="145" rx="18" fill="#292944" opacity=".8"/>
+      <rect x="304" y="34" width="104" height="145" rx="18" fill="#3a2f46" opacity=".8"/>
+      <rect x="416" y="34" width="88" height="145" rx="18" fill="#23384a" opacity=".9"/>
+      <text x="164" y="57" textAnchor="middle" fill="#e9e6f6" fontSize="12" fontWeight="800">INNER ROCKY PLANETS</text>
+      <text x="356" y="57" textAnchor="middle" fill="#f0e7f4" fontSize="12" fontWeight="800">GAS GIANTS</text>
+      <text x="460" y="57" textAnchor="middle" fill="#e3f2f7" fontSize="12" fontWeight="800">ICE GIANTS</text>
+      <circle cx="38" cy="117" r="25" fill="#f8c94e"/>
+      <text x="38" y="121" textAnchor="middle" fill="#5b4511" fontSize="11" fontWeight="900">Sun</text>
+      <line x1="66" y1="117" x2="500" y2="117" stroke="#6f718f" strokeWidth="2" opacity=".45"/>
+      {planets.map(p=><g key={p.name}>
+        {p.name==="Saturn"?<ellipse cx={p.x} cy="117" rx="27" ry="7" fill="none" stroke="#e1ca95" strokeWidth="3"/>:null}
+        <circle cx={p.x} cy="117" r={p.r} fill={p.c}/>
+        <text x={p.x} y="157" textAnchor="middle" fill="#e7e4f0" fontSize="10.5" fontWeight="700">{p.name}</text>
+      </g>)}
+      <g aria-label="Asteroid belt">
+        {[0,1,2,3,4,5,6,7,8].map(i=><circle key={i} cx={268+(i%3)*8} cy={96+Math.floor(i/3)*10} r={i%2?2:1.5} fill="#b8a891"/>)}
+        <path d="M258 77 V172" stroke="#b8a891" strokeWidth="1.5" strokeDasharray="4 4" opacity=".8"/>
+        <text x="274" y="194" textAnchor="middle" fill="#d8d0c3" fontSize="10.5" fontWeight="700">Asteroid belt</text>
+        <text x="274" y="207" textAnchor="middle" fill="#aaa4ba" fontSize="9.5">between Mars and Jupiter</text>
+      </g>
+      <path d="M77 221 H249" stroke="#8f8bb5" strokeWidth="2"/><path d="M77 217 V225 M249 217 V225" stroke="#8f8bb5" strokeWidth="2"/>
+      <text x="163" y="242" textAnchor="middle" fill="#d9d5e8" fontSize="11" fontWeight="800">4 inner rocky planets</text>
+      <path d="M307 221 H501" stroke="#8f8bb5" strokeWidth="2"/><path d="M307 217 V225 M501 217 V225" stroke="#8f8bb5" strokeWidth="2"/>
+      <text x="404" y="242" textAnchor="middle" fill="#d9d5e8" fontSize="11" fontWeight="800">4 outer giant planets</text>
+      <text x="260" y="260" textAnchor="middle" fill="#8f8aa1" fontSize="9">Not to scale</text>
     </svg>
   );
 }
