@@ -262,23 +262,122 @@ export function generateQuestion(skillId: string, stage: number, seed: number): 
   }
 
   if (skillId === "times") {
-    const tables = difficulty < 3 ? [2,5,10] : difficulty < 5 ? [2,3,4,5,10] : [2,3,4,5,6,7,8,9,10];
+    // Build multiplication and division from concrete equal groups into symbolic facts.
+    // Early stages deliberately keep quantities small enough to count or picture.
+    const storyThings = [
+      ["bags", "marbles"],
+      ["plates", "strawberries"],
+      ["boxes", "pencils"],
+      ["baskets", "apples"],
+    ] as const;
+    const sharingThings = ["cupcakes", "stickers", "grapes", "blocks"] as const;
+
+    if (difficulty === 1) {
+      const groups = pick(rng, [2,3]);
+      const each = int(rng, 2, 5);
+      const total = groups * each;
+
+      if (rng() < 0.58) {
+        const [containers, things] = pick(rng, storyThings);
+        return makeQuestion(
+          "times",
+          "multiply.equal_groups",
+          difficulty,
+          "group_story",
+          `There are ${groups} ${containers} with ${each} ${things} in each one. How many ${things} are there altogether?`,
+          numericChoices(rng, total, 4),
+          total,
+          seed,
+          `${groups} equal groups of ${each} make ${total}.`
+        );
+      }
+
+      const thing = pick(rng, sharingThings);
+      return makeQuestion(
+        "times",
+        "divide.share_small",
+        difficulty,
+        "division_story",
+        `${total} ${thing} are shared equally between ${groups} children. How many does each child get?`,
+        numericChoices(rng, each, 3),
+        each,
+        seed,
+        `Share the ${total} equally into ${groups} groups. Each group gets ${each}.`
+      );
+    }
+
+    if (difficulty === 2) {
+      const table = pick(rng, [2,3,5]);
+      const n = int(rng, 2, 5);
+      const total = table * n;
+      const mode = int(rng, 0, 3);
+
+      if (mode <= 1) {
+        const [containers, things] = pick(rng, storyThings);
+        return makeQuestion(
+          "times",
+          "multiply.groups_to_symbol",
+          difficulty,
+          "group_story",
+          `There are ${table} ${containers} with ${n} ${things} in each one. That is ${table} × ${n}. How many ${things} altogether?`,
+          numericChoices(rng, total, 5),
+          total,
+          seed
+        );
+      }
+
+      if (mode === 2) {
+        const thing = pick(rng, sharingThings);
+        return makeQuestion(
+          "times",
+          "divide.sharing_to_symbol",
+          difficulty,
+          "division_story",
+          `${total} ${thing} are shared equally between ${table} children. How many does each child get?`,
+          numericChoices(rng, n, 4),
+          n,
+          seed,
+          `This is the same as ${total} ÷ ${table} = ${n}.`
+        );
+      }
+
+      return makeQuestion("times", "multiply.small_facts", difficulty, "multiplication", `What is ${table} × ${n}?`, numericChoices(rng, total, 5), total, seed);
+    }
+
+    if (difficulty === 3) {
+      const table = pick(rng, [2,3,4,5,10]);
+      const n = int(rng, 2, 6);
+      const total = table * n;
+      const mode = int(rng, 0, 3);
+
+      if (mode === 0) {
+        const thing = pick(rng, sharingThings);
+        return makeQuestion("times", "divide.context", difficulty, "division_story", `${total} ${thing} are shared equally between ${table} children. How many does each child get?`, numericChoices(rng, n, 5), n, seed);
+      }
+      if (mode === 1) {
+        return makeQuestion("times", "divide.introduce_symbol", difficulty, "division", `${total} ÷ ${table} means sharing ${total} into ${table} equal groups. How many are in each group?`, numericChoices(rng, n, 5), n, seed);
+      }
+      return makeQuestion("times", "multiply.facts", difficulty, "multiplication", `What is ${table} × ${n}?`, numericChoices(rng, total, Math.max(5, table)), total, seed);
+    }
+
+    const tables = difficulty < 6 ? [2,3,4,5,10] : [2,3,4,5,6,7,8,9,10];
     const table = pick(rng, tables);
-    const n = int(rng, 1, difficulty < 4 ? 10 : 12);
-    const mode = int(rng, 0, 2);
+    const n = int(rng, 2, difficulty < 6 ? 10 : 12);
+    const total = table * n;
+    const mode = int(rng, 0, difficulty < 5 ? 2 : 3);
 
     if (mode === 0) {
-      const correct = table * n;
-      return makeQuestion("times", "multiply.facts", difficulty, "multiplication", `What is ${table} × ${n}?`, numericChoices(rng, correct, Math.max(4, table)), correct, seed);
+      const thing = pick(rng, sharingThings);
+      return makeQuestion("times", "divide.context", difficulty, "division_story", `${total} ${thing} are shared equally between ${table} children. How many does each child get?`, numericChoices(rng, n, 5), n, seed);
     }
-
     if (mode === 1) {
-      const total = table * n;
-      return makeQuestion("times", "divide.sharing", difficulty, "division", `${total} objects are shared equally into ${table} groups. How many are in each group?`, numericChoices(rng, n, 4), n, seed);
+      return makeQuestion("times", "divide.facts", difficulty, "division", `What is ${total} ÷ ${table}?`, numericChoices(rng, n, 5), n, seed);
     }
-
-    const correct = table * n;
-    return makeQuestion("times", "multiply.groups", difficulty, "group_story", `There are ${table} bags with ${n} marbles in each bag. How many marbles altogether?`, numericChoices(rng, correct, Math.max(4, table)), correct, seed);
+    if (mode === 2) {
+      const [containers, things] = pick(rng, storyThings);
+      return makeQuestion("times", "multiply.context", difficulty, "group_story", `There are ${table} ${containers} with ${n} ${things} in each one. How many ${things} altogether?`, numericChoices(rng, total, Math.max(5, table)), total, seed);
+    }
+    return makeQuestion("times", "multiply.facts", difficulty, "multiplication", `What is ${table} × ${n}?`, numericChoices(rng, total, Math.max(5, table)), total, seed);
   }
 
   if (skillId === "fractions") {
