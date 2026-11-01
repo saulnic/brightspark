@@ -9,7 +9,7 @@ import { validateQuestion } from "@/learning/validate-question";
 import type { LearningQuestion } from "@/learning/types";
 import { ChoiceVisual, QuestionVisual } from "./QuestionVisual";
 import { ScienceLessonCard } from "./ScienceLessonCard";
-import { getScienceLesson, getScienceLessonCount, scienceQuestionAt } from "@/content/science-lessons";
+import { getScienceLesson, getScienceLessonCount, getScienceLessons, scienceQuestionAt } from "@/content/science-lessons";
 import { getReward, pickReward, rewardInterval, type Reward } from "@/content/rewards";
 
 const DEFAULT_ROUND_SIZE = 5;
@@ -84,7 +84,11 @@ export function QuestionPlayer({
   const [earnedNow, setEarnedNow] = useState<Reward[]>([]);
   const [rewardPopupOpen, setRewardPopupOpen] = useState(false);
   const [restored, setRestored] = useState(false);
+  const [progressScienceLessonIndex, setProgressScienceLessonIndex] = useState(initialScienceLessonIndex ?? 0);
   const [scienceLessonIndex, setScienceLessonIndex] = useState(initialScienceLessonIndex ?? 0);
+  const [reviewMode, setReviewMode] = useState(false);
+  const [showLessonPicker, setShowLessonPicker] = useState(false);
+  const scienceLessons = getScienceLessons(skillId);
   const scienceLessonCount = getScienceLessonCount(skillId);
   const scienceLesson = useMemo(() => getScienceLesson(skillId, scienceLessonIndex), [skillId, scienceLessonIndex]);
   const [lessonStarted, setLessonStarted] = useState(false);
@@ -202,86 +206,90 @@ export function QuestionPlayer({
         );
       }
 
-      let nextXp = Math.max(0, xp + correct - incorrect);
-      let nextStage = stage;
-      while (nextXp >= 30 && nextStage < 8) {
-        nextXp -= 30;
-        nextStage += 1;
-      }
-
-      const oldSkillStars=(Math.max(1,stage)-1)*30+xp;
-      const nextSkillStars=(Math.max(1,nextStage)-1)*30+nextXp;
-      const nextTotalStars=Math.max(0,totalStars-oldSkillStars+nextSkillStars);
-      await supabase.from("learner_skill_progress").upsert({
-        learner_id: learnerId,
-        skill_id: skillId,
-        stage: nextStage,
-        xp: nextXp,
-        last_practised_at: new Date().toISOString(),
-      });
-
-      let updatedRewardIds=[...earnedRewardIds];
-      let updatedSequence=rewardSequence;
-      let updatedNextRewardAt=nextRewardAt??rewardInterval(learnerId,rewardSequence);
-      const newlyEarned:Reward[]=[];
-      if(nextTotalStars>=updatedNextRewardAt){
-        const reward=pickReward(learnerId,updatedSequence,updatedRewardIds);
-        if(reward){
-          const {error:rewardInsertError}=await supabase.from("learner_rewards").upsert({
-            learner_id:learnerId,reward_id:reward.id,source:"surprise",metadata:{earned_at_stars:nextTotalStars}
-          },{onConflict:"learner_id,reward_id",ignoreDuplicates:true});
-          if(!rewardInsertError){
-            updatedRewardIds=[...updatedRewardIds,reward.id];
-            newlyEarned.push(reward);
-            updatedSequence+=1;
-            updatedNextRewardAt=nextTotalStars+rewardInterval(learnerId,updatedSequence);
-          }
+      if (!reviewMode) {
+        let nextXp = Math.max(0, xp + correct - incorrect);
+        let nextStage = stage;
+        while (nextXp >= 30 && nextStage < 8) {
+          nextXp -= 30;
+          nextStage += 1;
         }
-      }
-      await supabase.from("learner_reward_state").upsert({
-        learner_id:learnerId,next_reward_star:updatedNextRewardAt,reward_sequence:updatedSequence,updated_at:new Date().toISOString()
-      });
-
-      if (scienceLesson && scienceLessonCount > 0) {
-        const nextLessonIndex=(scienceLessonIndex+1)%scienceLessonCount;
-        await supabase.from("learner_science_progress").upsert({
-          learner_id:learnerId,
-          skill_id:skillId,
-          lesson_index:nextLessonIndex,
-          updated_at:new Date().toISOString(),
+  
+        const oldSkillStars=(Math.max(1,stage)-1)*30+xp;
+        const nextSkillStars=(Math.max(1,nextStage)-1)*30+nextXp;
+        const nextTotalStars=Math.max(0,totalStars-oldSkillStars+nextSkillStars);
+        await supabase.from("learner_skill_progress").upsert({
+          learner_id: learnerId,
+          skill_id: skillId,
+          stage: nextStage,
+          xp: nextXp,
+          last_practised_at: new Date().toISOString(),
         });
-      }
-
-      let earnedBonusName:string|null=null;
-      if (bonusRewardId && correct >= (bonusTargetCorrect ?? Math.ceil(roundSize * 0.8))) {
-        let challengeReward=getReward(bonusRewardId)??null;
-        if(challengeReward&&updatedRewardIds.includes(challengeReward.id))challengeReward=pickReward(learnerId,updatedSequence+10000,updatedRewardIds);
-        if(challengeReward){
-          const {error:rewardError}=await supabase.from("learner_rewards").upsert({
-            learner_id:learnerId,reward_id:challengeReward.id,source:"challenge",metadata:{skill_id:skillId}
-          },{onConflict:"learner_id,reward_id",ignoreDuplicates:true});
-          if(!rewardError){
-            updatedRewardIds=[...updatedRewardIds,challengeReward.id];
-            if(!newlyEarned.some(x=>x.id===challengeReward!.id))newlyEarned.push(challengeReward);
-            earnedBonusName=challengeReward.name;
-            await supabase.from("reward_challenges").insert({
-              learner_id:learnerId,skill_id:skillId,reward_id:challengeReward.id,challenge_type:"avoided_topic",status:"completed",
-              criteria:{target_correct:bonusTargetCorrect??Math.ceil(roundSize*.8),round_size:roundSize},completed_at:new Date().toISOString()
-            });
+  
+        let updatedRewardIds=[...earnedRewardIds];
+        let updatedSequence=rewardSequence;
+        let updatedNextRewardAt=nextRewardAt??rewardInterval(learnerId,rewardSequence);
+        const newlyEarned:Reward[]=[];
+        if(nextTotalStars>=updatedNextRewardAt){
+          const reward=pickReward(learnerId,updatedSequence,updatedRewardIds);
+          if(reward){
+            const {error:rewardInsertError}=await supabase.from("learner_rewards").upsert({
+              learner_id:learnerId,reward_id:reward.id,source:"surprise",metadata:{earned_at_stars:nextTotalStars}
+            },{onConflict:"learner_id,reward_id",ignoreDuplicates:true});
+            if(!rewardInsertError){
+              updatedRewardIds=[...updatedRewardIds,reward.id];
+              newlyEarned.push(reward);
+              updatedSequence+=1;
+              updatedNextRewardAt=nextTotalStars+rewardInterval(learnerId,updatedSequence);
+            }
           }
         }
+        await supabase.from("learner_reward_state").upsert({
+          learner_id:learnerId,next_reward_star:updatedNextRewardAt,reward_sequence:updatedSequence,updated_at:new Date().toISOString()
+        });
+  
+        if (scienceLesson && scienceLessonCount > 0) {
+          const nextLessonIndex=(progressScienceLessonIndex+1)%scienceLessonCount;
+          await supabase.from("learner_science_progress").upsert({
+            learner_id:learnerId,
+            skill_id:skillId,
+            lesson_index:nextLessonIndex,
+            updated_at:new Date().toISOString(),
+          });
+        }
+  
+        let earnedBonusName:string|null=null;
+        if (bonusRewardId && correct >= (bonusTargetCorrect ?? Math.ceil(roundSize * 0.8))) {
+          let challengeReward=getReward(bonusRewardId)??null;
+          if(challengeReward&&updatedRewardIds.includes(challengeReward.id))challengeReward=pickReward(learnerId,updatedSequence+10000,updatedRewardIds);
+          if(challengeReward){
+            const {error:rewardError}=await supabase.from("learner_rewards").upsert({
+              learner_id:learnerId,reward_id:challengeReward.id,source:"challenge",metadata:{skill_id:skillId}
+            },{onConflict:"learner_id,reward_id",ignoreDuplicates:true});
+            if(!rewardError){
+              updatedRewardIds=[...updatedRewardIds,challengeReward.id];
+              if(!newlyEarned.some(x=>x.id===challengeReward!.id))newlyEarned.push(challengeReward);
+              earnedBonusName=challengeReward.name;
+              await supabase.from("reward_challenges").insert({
+                learner_id:learnerId,skill_id:skillId,reward_id:challengeReward.id,challenge_type:"avoided_topic",status:"completed",
+                criteria:{target_correct:bonusTargetCorrect??Math.ceil(roundSize*.8),round_size:roundSize},completed_at:new Date().toISOString()
+              });
+            }
+          }
+        }
+  
+        setStage(nextStage);
+        setXp(nextXp);
+        setTotalStars(nextTotalStars);
+        setEarnedRewardIds(updatedRewardIds);
+        setRewardSequence(updatedSequence);
+        setNextRewardAt(updatedNextRewardAt);
+        setBonusUnlockedName(earnedBonusName);
+        setAnswers(nextAnswers);
+        setEarnedNow(newlyEarned);
+        if(newlyEarned.length)setRewardPopupOpen(true);
+  
       }
-
-      setStage(nextStage);
-      setXp(nextXp);
-      setTotalStars(nextTotalStars);
-      setEarnedRewardIds(updatedRewardIds);
-      setRewardSequence(updatedSequence);
-      setNextRewardAt(updatedNextRewardAt);
-      setBonusUnlockedName(earnedBonusName);
       setAnswers(nextAnswers);
-      setEarnedNow(newlyEarned);
-      if(newlyEarned.length)setRewardPopupOpen(true);
       clearSavedRound();
       router.refresh();
       emitFeedback("complete");
@@ -291,8 +299,29 @@ export function QuestionPlayer({
     }
   }
 
+  function resetRoundForLesson(target:number,review:boolean) {
+    setScienceLessonIndex(target);
+    setReviewMode(review);
+    setShowLessonPicker(false);
+    setSeeds(seedsForRound());
+    setIndex(0);
+    setAnswers([]);
+    setSelected(null);
+    setStartedAt(Date.now());
+    setDone(false);
+    setLessonStarted(false);
+    clearSavedRound();
+    setEarnedNow([]);
+    setBonusUnlockedName(null);
+    setRewardPopupOpen(false);
+    setRoundKey((v) => v + 1);
+  }
+
   function playAgain() {
-    if(scienceLesson && scienceLessonCount>0)setScienceLessonIndex((scienceLessonIndex+1)%scienceLessonCount);
+    if(scienceLesson && scienceLessonCount>0){
+      resetRoundForLesson(progressScienceLessonIndex,false);
+      return;
+    }
     setSeeds(seedsForRound());
     setIndex(0);
     setAnswers([]);
@@ -311,8 +340,23 @@ export function QuestionPlayer({
     return <section className="routeLoading" role="status"><span className="routeSpinner" aria-hidden="true"/><strong>Loading…</strong></section>;
   }
 
+  if (scienceLesson && showLessonPicker && !lessonStarted && !done) {
+    return <section className="scienceLessonPickerCard">
+      <div className="scienceLessonBadge">🔬 Choose a lesson</div>
+      <h1>{skillName} lessons</h1>
+      <p className="muted">Replay any lesson for revision. Review lessons do not change progress or earn rewards.</p>
+      <div className="scienceLessonList">
+        {scienceLessons.map((item,i)=><button key={item.id} className={i===progressScienceLessonIndex?"scienceLessonRow current":"scienceLessonRow"} onClick={()=>resetRoundForLesson(i,i!==progressScienceLessonIndex)}>
+          <span><strong>Lesson {i+1}</strong><small>{item.title}</small></span>
+          <b>{i===progressScienceLessonIndex?"Continue":"Review"}</b>
+        </button>)}
+      </div>
+      <button className="secondaryButton" onClick={()=>setShowLessonPicker(false)}>Back</button>
+    </section>;
+  }
+
   if (scienceLesson && !lessonStarted && !done) {
-    return <ScienceLessonCard lesson={scienceLesson} lessonNumber={scienceLessonIndex+1} lessonTotal={scienceLessonCount} onStart={() => { setLessonStarted(true); setStartedAt(Date.now()); persistRound(index, answers, true); }} />;
+    return <ScienceLessonCard lesson={scienceLesson} lessonNumber={scienceLessonIndex+1} lessonTotal={scienceLessonCount} onBrowseLessons={()=>setShowLessonPicker(true)} onStart={() => { setLessonStarted(true); setStartedAt(Date.now()); persistRound(index, answers, true); }} />;
   }
 
   if (done) {
@@ -325,9 +369,9 @@ export function QuestionPlayer({
         <h1>{score}/{roundSize} correct</h1>
         <p>{score === roundSize ? "Perfect round!" : score >= Math.ceil(roundSize * 0.6) ? "Nice work!" : "Good practice — every round helps."}</p>
         {bonusUnlockedName ? <div className="bonusUnlocked">🎁 Bonus reward unlocked: {bonusUnlockedName}!</div> : null}
-        <div className="roundProgress">{scienceLesson ? `Lesson ${scienceLessonIndex+1} of ${scienceLessonCount} complete · ` : ""}Stage {stage} · {xp}/30 XP</div>
+        <div className="roundProgress">{scienceLesson ? `${reviewMode?"Review":"Lesson"} ${scienceLessonIndex+1} of ${scienceLessonCount} complete${reviewMode?"":" · "}` : ""}{reviewMode?"":`Stage ${stage} · ${xp}/30 XP`}</div>
         <div className="finishActions">
-          <button className="primaryButton" onClick={playAgain}>{scienceLesson ? "Next lesson" : "Play again"}</button>
+          <button className="primaryButton" onClick={reviewMode?()=>{setDone(false);setLessonStarted(false);setShowLessonPicker(true);}:playAgain}>{scienceLesson ? (reviewMode?"Lessons":"Next lesson") : "Play again"}</button>
           <button className="secondaryButton" onClick={()=>{router.push(`/learn/${learnerId}`);router.refresh();}}>Back to topics</button>
         </div>
       </section>
@@ -339,7 +383,7 @@ export function QuestionPlayer({
     <section className="questionShell">
       <header className="questionHeader">
         <Link href={`/learn/${learnerId}`} className="textButton" prefetch>← Topics</Link>
-        <strong>{skillName}</strong>
+        <strong>{skillName}{reviewMode?" · Review":""}</strong>
         <span>{index + 1}/{roundSize}</span>
       </header>
       <div className="progressTrack"><div style={{ width: `${((index + 1) / roundSize) * 100}%` }} /></div>

@@ -268,3 +268,14 @@ small { color:#77718a; }
 .rewardModalActions{display:grid;grid-template-columns:1fr 1fr;gap:9px}
 .rewardModalActions a,.rewardModalActions button{text-align:center}
 @media(max-width:520px){.rewardModalActions{grid-template-columns:1fr}}
+
+.scienceConceptVisuals{display:grid;gap:10px;margin-bottom:16px}
+.scienceConceptVisuals .scienceSceneLarge{margin-bottom:0}
+.scienceLessonActions{display:grid;grid-template-columns:1fr auto;gap:9px}
+.scienceLessonPickerCard{max-width:680px;margin:0 auto;background:#fff;border-radius:28px;padding:22px;box-shadow:0 14px 38px rgba(37,36,58,.08)}
+.scienceLessonPickerCard h1{margin:0 0 6px}
+.scienceLessonList{display:grid;gap:8px;margin:16px 0}
+.scienceLessonRow{width:100%;border:1px solid #e7e2f2;background:#fff;border-radius:16px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:12px;text-align:left;color:#2f2d3e}
+.scienceLessonRow.current{border:2px solid #6f5bd3;background:#f7f4ff}
+.scienceLessonRow span{display:grid;gap:2px}.scienceLessonRow small{color:#77718a}.scienceLessonRow b{color:#6f5bd3;font-size:.78rem}
+@media(max-width:600px){.scienceLessonActions{grid-template-columns:1fr}.scienceLessonPickerCard{padding:16px;border-radius:22px}.scienceConceptVisuals{gap:8px}}

@@ -7,18 +7,20 @@ export function ScienceLessonCard({
   onStart,
   lessonNumber,
   lessonTotal,
+  onBrowseLessons,
 }: {
   lesson: ScienceLesson;
   onStart: () => void;
   lessonNumber?: number;
   lessonTotal?: number;
+  onBrowseLessons?: () => void;
 }) {
   return (
     <section className="scienceLessonCard">
       <div className="scienceLessonBadge">🔬 {lessonNumber && lessonTotal ? `Lesson ${lessonNumber} of ${lessonTotal}` : "Learn first"}</div>
       <h1>{lesson.title}</h1>
       <p className="scienceLessonIntro">{lesson.intro}</p>
-      <ScienceSceneVisual scene={lesson.scene} detail={lesson.visualDetail} large />
+      {lesson.visualDetails?.length ? <div className="scienceConceptVisuals">{lesson.visualDetails.map(detail=><ScienceSceneVisual key={detail} scene={lesson.scene} detail={detail} large />)}</div> : <ScienceSceneVisual scene={lesson.scene} detail={lesson.visualDetail} large />}
       <div className="scienceFacts">
         {lesson.facts.map((fact, index) => (
           <div className="scienceFact" key={fact.id}>
@@ -27,9 +29,10 @@ export function ScienceLessonCard({
           </div>
         ))}
       </div>
-      <button className="primaryButton scienceStartButton" onClick={onStart}>
-        Start the 10 questions →
-      </button>
+      <div className="scienceLessonActions">
+        <button className="primaryButton scienceStartButton" onClick={onStart}>Start the 10 questions →</button>
+        {onBrowseLessons ? <button className="secondaryButton" onClick={onBrowseLessons}>Lessons</button> : null}
+      </div>
     </section>
   );
 }
@@ -45,7 +48,15 @@ export function ScienceSceneVisual({
 }) {
   return (
     <div className={large ? "scienceScene scienceSceneLarge" : "scienceScene"}>
-      {scene === "solar" ? (detail === "structure" ? <SolarStructureVisual /> : <SolarVisual />) : null}
+      {scene === "solar" ? (
+        detail === "structure" ? <SolarStructureVisual /> :
+        detail === "daynight" ? <DayNightVisual /> :
+        detail === "year" ? <YearVisual /> :
+        detail === "tilt" ? <TiltVisual /> :
+        detail === "seasons" ? <SeasonsVisual /> :
+        detail === "phases" ? <MoonPhasesVisual /> :
+        <SolarVisual />
+      ) : null}
       {scene === "volcano" ? <VolcanoVisual /> : null}
       {scene === "dinosaur" ? <DinosaurVisual /> : null}
       {scene === "habitat" ? <HabitatVisual /> : null}
@@ -121,6 +132,66 @@ function SolarStructureVisual() {
       <text x="260" y="260" textAnchor="middle" fill="#8f8aa1" fontSize="9">Not to scale</text>
     </svg>
   );
+}
+
+function DayNightVisual(){
+  return <svg viewBox="0 0 520 230" role="img" aria-label="Earth rotating to create day and night">
+    <rect width="520" height="230" rx="24" fill="#17172d"/>
+    <circle cx="82" cy="115" r="45" fill="#f8c94e"/><text x="82" y="120" textAnchor="middle" fontSize="15" fontWeight="900" fill="#5b4511">Sun</text>
+    <g transform="translate(320 115)"><circle r="68" fill="#4287c7"/><path d="M0 -68 A68 68 0 0 1 0 68 A68 68 0 0 1 0 -68Z" fill="#11162c" opacity=".78"/><path d="M-18 -46 Q10 -56 28 -34 Q11 -13 -6 -18 Q-22 -27 -18 -46Z" fill="#65ad68"/><path d="M-24 16 Q-1 5 21 23 Q8 48 -20 43Z" fill="#65ad68"/></g>
+    <path d="M246 58 Q320 22 394 58" fill="none" stroke="#8fd1ff" strokeWidth="6" strokeLinecap="round"/><path d="M390 48 L405 61 L386 66" fill="#8fd1ff"/>
+    <path d="M132 92 H241 M132 115 H241 M132 138 H241" stroke="#ffe58a" strokeWidth="6" strokeLinecap="round"/>
+    <text x="285" y="205" fill="#f2f0f8" fontSize="14" fontWeight="800">Earth spins once in about 24 hours</text>
+    <text x="270" y="92" fill="#ffe17a" fontSize="13" fontWeight="800">day</text><text x="365" y="92" fill="#c8d1e8" fontSize="13" fontWeight="800">night</text>
+  </svg>;
+}
+function YearVisual(){
+  return <svg viewBox="0 0 520 230" role="img" aria-label="Earth completing one orbit around the Sun in about 365 days">
+    <rect width="520" height="230" rx="24" fill="#17172d"/><ellipse cx="260" cy="115" rx="185" ry="78" fill="none" stroke="#74aee8" strokeWidth="4"/>
+    <circle cx="260" cy="115" r="38" fill="#f8c94e"/><text x="260" y="120" textAnchor="middle" fontSize="14" fontWeight="900" fill="#5b4511">Sun</text>
+    {[[82,115],[260,37],[438,115],[260,193]].map(([x,y],i)=><g key={i}><circle cx={x} cy={y} r="18" fill="#4c91d2"/><path d={`M${x-8} ${y-6} q12 -9 20 2 q-5 11 -18 9Z`} fill="#6bb56e"/></g>)}
+    <path d="M356 46 l18 4 -12 14" fill="none" stroke="#b8daf5" strokeWidth="4" strokeLinecap="round"/>
+    <text x="260" y="222" textAnchor="middle" fill="#f2f0f8" fontSize="15" fontWeight="900">1 orbit = about 365 days = 1 year</text>
+  </svg>;
+}
+function TiltVisual(){
+  return <svg viewBox="0 0 520 230" role="img" aria-label="Earth's axis tilted about 23.5 degrees">
+    <rect width="520" height="230" rx="24" fill="#eaf4fb"/>
+    <circle cx="260" cy="112" r="70" fill="#4c91d2"/><path d="M220 78 Q258 57 293 78 Q278 99 244 96Z" fill="#69b66d"/><path d="M225 130 Q255 111 294 136 Q276 162 238 156Z" fill="#69b66d"/>
+    <line x1="260" y1="25" x2="260" y2="199" stroke="#8993a8" strokeWidth="3" strokeDasharray="7 7"/>
+    <line x1="224" y1="31" x2="296" y2="194" stroke="#d45878" strokeWidth="6" strokeLinecap="round"/>
+    <path d="M260 48 A42 42 0 0 0 242 52" fill="none" stroke="#6f5bd3" strokeWidth="3"/><text x="183" y="50" fill="#5948bb" fontSize="18" fontWeight="900">23.5°</text>
+    <text x="306" y="42" fill="#34313b" fontSize="14" fontWeight="800">North Pole</text><text x="305" y="196" fill="#34313b" fontSize="14" fontWeight="800">South Pole</text>
+    <text x="260" y="222" textAnchor="middle" fill="#34313b" fontSize="14" fontWeight="900">Earth spins around this tilted axis</text>
+  </svg>;
+}
+function SeasonsVisual(){
+  return <svg viewBox="0 0 520 300" role="img" aria-label="Earth's tilted axis stays pointed the same way as Earth orbits the Sun, creating seasons">
+    <rect width="520" height="300" rx="24" fill="#17172d"/><ellipse cx="260" cy="145" rx="190" ry="100" fill="none" stroke="#7186ad" strokeWidth="3"/>
+    <circle cx="260" cy="145" r="38" fill="#f8c94e"/><text x="260" y="150" textAnchor="middle" fontSize="14" fontWeight="900" fill="#5b4511">Sun</text>
+    {[[88,145,"June","S winter / N summer"],[260,48,"September","equinox"],[432,145,"December","S summer / N winter"],[260,242,"March","equinox"]].map(([x,y,a,b],i)=><g key={i}>
+      <circle cx={Number(x)} cy={Number(y)} r="24" fill="#4c91d2"/><line x1={Number(x)-10} y1={Number(y)+31} x2={Number(x)+10} y2={Number(y)-31} stroke="#f28aa1" strokeWidth="4"/>
+      <text x={Number(x)} y={Number(y)+(i===1?-38: i===3?48:45)} textAnchor="middle" fill="#f3f0fb" fontSize="11" fontWeight="800">{String(a)}</text>
+      {(i===0||i===2)?<text x={Number(x)} y={Number(y)+(i===0?60:60)} textAnchor="middle" fill="#d7d0ed" fontSize="9.5">{String(b)}</text>:null}
+    </g>)}
+    <text x="260" y="287" textAnchor="middle" fill="#f3f0fb" fontSize="12" fontWeight="800">The axis keeps pointing the same way as Earth moves around the Sun</text>
+  </svg>;
+}
+function MoonPhasesVisual(){
+  const phases=[["New",70,"#303343"],["Crescent",135,"#d9dbe4"],["Quarter",200,"#ececf2"],["Gibbous",265,"#f2f1e8"],["Full",330,"#f8f7ed"],["Quarter",395,"#ececf2"],["Crescent",460,"#d9dbe4"]];
+  return <svg viewBox="0 0 520 230" role="img" aria-label="Moon phases from new moon to full moon and back">
+    <rect width="520" height="230" rx="24" fill="#17172d"/><circle cx="36" cy="72" r="25" fill="#f8c94e"/><text x="36" y="108" textAnchor="middle" fill="#ffe989" fontSize="11" fontWeight="800">Sunlight →</text>
+    {phases.map(([name,x,c],i)=><g key={i}><circle cx={Number(x)} cy="112" r="22" fill={String(c)} stroke="#737b9e" strokeWidth="2"/>
+      {i===1?<path d={`M${Number(x)} 90 A22 22 0 0 0 ${Number(x)} 134 A14 22 0 0 1 ${Number(x)} 90Z`} fill="#303343"/>:null}
+      {i===2?<path d={`M${Number(x)-22} 90 H${Number(x)} V134 H${Number(x)-22}Z`} fill="#303343"/>:null}
+      {i===3?<path d={`M${Number(x)-22} 90 Q${Number(x)-4} 112 ${Number(x)-22} 134 A22 22 0 0 1 ${Number(x)-22} 90Z`} fill="#303343"/>:null}
+      {i===5?<path d={`M${Number(x)} 90 H${Number(x)+22} V134 H${Number(x)}Z`} fill="#303343"/>:null}
+      {i===6?<path d={`M${Number(x)} 90 A22 22 0 0 1 ${Number(x)} 134 A14 22 0 0 0 ${Number(x)} 90Z`} fill="#303343"/>:null}
+      <text x={Number(x)} y="154" textAnchor="middle" fill="#f0edf8" fontSize="9.5" fontWeight="700">{String(name)}</text>
+    </g>)}
+    <text x="260" y="195" textAnchor="middle" fill="#d9d5e8" fontSize="12" fontWeight="800">We see different amounts of the Moon's sunlit half</text>
+    <text x="260" y="215" textAnchor="middle" fill="#a9a5bb" fontSize="10">Earth's shadow does not cause the normal phases</text>
+  </svg>;
 }
 
 function VolcanoVisual() {

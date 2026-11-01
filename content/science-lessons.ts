@@ -11,6 +11,7 @@ export type ScienceLesson = {
   facts: { id: string; text: string }[];
   scene: ScienceScene;
   visualDetail?: string;
+  visualDetails?: string[];
   questions: {
     factId: string;
     prompt: string;
@@ -63,24 +64,25 @@ const LESSONS: Record<string, ScienceLesson[]> = {
     },
     {
       id:"solar-3-earth-motion", skillId:"solar", stage:3, title:"Earth in motion", scene:"solar",
-      intro:"Earth spins every day and travels around the Sun every year. Its tilted axis gives us the seasons.",
+      visualDetails:["daynight","year","tilt","seasons"],
+      intro:"Earth spins once each day and travels around the Sun once each year. Its tilted axis changes how sunlight reaches each hemisphere as Earth moves around the Sun.",
       facts:[
-        {id:"rotation",text:"Earth rotates once in about 24 hours."},
-        {id:"daynight",text:"Earth's rotation causes day and night."},
-        {id:"year",text:"Earth takes about 365 days to orbit the Sun once."},
-        {id:"tilt",text:"Earth's axis is tilted as Earth travels around the Sun."},
-        {id:"seasons",text:"The seasons are mainly caused by Earth's tilt, not by Earth being nearer to or farther from the Sun."},
+        {id:"rotation",text:"Earth rotates, or spins, once in about 24 hours. This gives us day and night."},
+        {id:"year",text:"Earth takes about 365 days to complete one orbit around the Sun. That is one year."},
+        {id:"tilt",text:"Earth's axis is tilted about 23.5°, and it keeps pointing in nearly the same direction as Earth orbits the Sun."},
+        {id:"seasons",text:"Because Earth is tilted and moves around the Sun, each hemisphere takes turns tilting toward and away from the Sun."},
+        {id:"sunlight",text:"A hemisphere tilted toward the Sun gets more direct sunlight and longer days; tilted away, it gets less direct sunlight and shorter days."},
       ],
       questions:[
-        {factId:"rotation",prompt:"About how long does Earth take to rotate once?",reviewPrompt:"One complete spin of Earth takes about how long?",answer:"24 hours",distractors:["One month","One year","12 hours"]},
-        {factId:"daynight",prompt:"What causes day and night?",reviewPrompt:"Why does your part of Earth move into sunlight and then darkness?",answer:"Earth's rotation",distractors:["The Moon's phases","Clouds moving","The Sun switching off"]},
-        {factId:"year",prompt:"About how long does Earth take to orbit the Sun?",reviewPrompt:"One complete trip around the Sun gives Earth what length of time?",answer:"365 days",distractors:["24 hours","28 days","10 years"]},
-        {factId:"tilt",prompt:"What is special about Earth's axis?",reviewPrompt:"As Earth travels around the Sun, what stays tilted?",answer:"It is tilted",distractors:["It disappears","It points at the Sun all year","It changes into an orbit"]},
-        {factId:"seasons",prompt:"What mainly causes Earth's seasons?",reviewPrompt:"Why do summer and winter happen at different times of year?",answer:"Earth's tilted axis",distractors:["Earth moving much closer to the Sun","The Moon blocking sunlight","Changes in the Sun's size"]},
+        {factId:"rotation",prompt:"What causes day and night?",reviewPrompt:"Why does your part of Earth move into sunlight and then darkness?",answer:"Earth spinning on its axis",distractors:["Earth moving around the Sun","The Moon moving around Earth","The Sun switching off"],visual:{kind:"science_scene",scene:"solar",detail:"daynight"}},
+        {factId:"year",prompt:"What makes one year on Earth?",reviewPrompt:"What does Earth complete in about 365 days?",answer:"One orbit around the Sun",distractors:["One spin on its axis","One Moon phase","One season"],visual:{kind:"science_scene",scene:"solar",detail:"year"}},
+        {factId:"tilt",prompt:"What stays tilted as Earth travels around the Sun?",reviewPrompt:"What is tilted about 23.5°?",answer:"Earth's axis",distractors:["Earth's orbit","The Sun","The Moon's orbit"],visual:{kind:"science_scene",scene:"solar",detail:"tilt"}},
+        {factId:"seasons",prompt:"Why do we have seasons?",reviewPrompt:"Why do summer and winter happen during Earth's yearly trip around the Sun?",answer:"Earth is tilted and moves around the Sun",distractors:["Earth gets much closer to the Sun in summer","The Moon blocks sunlight in winter","The Sun changes size during the year"],visual:{kind:"science_scene",scene:"solar",detail:"seasons"}},
+        {factId:"sunlight",prompt:"What happens when your hemisphere is tilted toward the Sun?",reviewPrompt:"Which conditions usually come with being tilted toward the Sun?",answer:"More direct sunlight and longer days",distractors:["Less direct sunlight and shorter days","The Sun becomes larger","Earth stops rotating"],visual:{kind:"science_scene",scene:"solar",detail:"seasons"}},
       ],
     },
     {
-      id:"solar-4-moon", skillId:"solar", stage:4, title:"The Moon and its phases", scene:"solar",
+      id:"solar-4-moon", skillId:"solar", stage:4, title:"The Moon and its phases", scene:"solar", visualDetail:"phases",
       intro:"The Moon orbits Earth, and the changing part of its sunlit half that we can see creates the Moon's phases.",
       facts:[
         {id:"moonorbit",text:"The Moon orbits Earth about once every month."},
@@ -90,11 +92,11 @@ const LESSONS: Record<string, ScienceLesson[]> = {
         {id:"shadow",text:"Normal Moon phases are not caused by Earth's shadow; Earth's shadow causes a lunar eclipse."},
       ],
       questions:[
-        {factId:"moonorbit",prompt:"What does the Moon orbit?",reviewPrompt:"About once each month, the Moon completes a trip around what?",answer:"Earth",distractors:["The Sun directly","Mars","Jupiter"]},
-        {factId:"light",prompt:"Why can we see the Moon?",reviewPrompt:"Where does the Moon's visible light come from?",answer:"It reflects sunlight",distractors:["It makes its own light like a star","City lights on the Moon","Lightning"]},
-        {factId:"phases",prompt:"Why does the Moon appear to change shape?",reviewPrompt:"What creates the changing phases we see from Earth?",answer:"We see different amounts of its sunlit half",distractors:["The Moon physically changes shape","Clouds carve pieces away","Earth's shadow covers it every night"]},
-        {factId:"fullnew",prompt:"Which phase looks fully lit from Earth?",reviewPrompt:"Which Moon phase appears as a bright complete circle?",answer:"Full moon",distractors:["New moon","Crescent moon","Quarter moon"]},
-        {factId:"shadow",prompt:"Are normal Moon phases caused by Earth's shadow?",reviewPrompt:"Earth's shadow can cause an eclipse. Does it cause the regular monthly phases?",answer:"No",distractors:["Yes, every night","Only at full moon","Only in summer"]},
+        {factId:"moonorbit",prompt:"What does the Moon orbit?",reviewPrompt:"About once each month, the Moon completes a trip around what?",answer:"Earth",distractors:["The Sun directly","Mars","Jupiter"],visual:{kind:"science_scene",scene:"solar",detail:"phases"}},
+        {factId:"light",prompt:"Why can we see the Moon?",reviewPrompt:"Where does the Moon's visible light come from?",answer:"It reflects sunlight",distractors:["It makes its own light like a star","City lights on the Moon","Lightning"],visual:{kind:"science_scene",scene:"solar",detail:"phases"}},
+        {factId:"phases",prompt:"Why does the Moon appear to change shape?",reviewPrompt:"What creates the changing phases we see from Earth?",answer:"We see different amounts of its sunlit half",distractors:["The Moon physically changes shape","Clouds carve pieces away","Earth's shadow covers it every night"],visual:{kind:"science_scene",scene:"solar",detail:"phases"}},
+        {factId:"fullnew",prompt:"Which phase looks fully lit from Earth?",reviewPrompt:"Which Moon phase appears as a bright complete circle?",answer:"Full moon",distractors:["New moon","Crescent moon","Quarter moon"],visual:{kind:"science_scene",scene:"solar",detail:"phases"}},
+        {factId:"shadow",prompt:"Are normal Moon phases caused by Earth's shadow?",reviewPrompt:"Earth's shadow can cause an eclipse. Does it cause the regular monthly phases?",answer:"No",distractors:["Yes, every night","Only at full moon","Only in summer"],visual:{kind:"science_scene",scene:"solar",detail:"phases"}},
       ],
     },
     {
@@ -458,6 +460,9 @@ export function getScienceLesson(skillId:string, lessonIndex:number):ScienceLess
 export function getScienceLessonCount(skillId:string){
   return LESSONS[skillId]?.length ?? 0;
 }
+export function getScienceLessons(skillId:string){
+  return LESSONS[skillId] ?? [];
+}
 
 export function scienceQuestionAt(lesson:ScienceLesson, index:number, seed:number):LearningQuestion {
   const directCount=lesson.questions.length;
@@ -485,7 +490,7 @@ export function scienceQuestionAt(lesson:ScienceLesson, index:number, seed:numbe
     correctChoiceId:correct.id,
     explanation:lesson.facts.find((fact)=>fact.id===source.factId)?.text,
     seed,
-    contentVersion:"science-lesson-5",
+    contentVersion:"science-lesson-6",
   };
 }
 
