@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import {saveGeographyRound} from "@/lib/geography-progress";
 
 import { continentPaths } from "./continent-paths";
 
@@ -45,16 +46,18 @@ function WorldMap({highlight,labels=true,onSelect}:{highlight?:string;labels?:bo
     <text x="508" y="282" textAnchor="end" fontSize="8" fill="#527c9a">Geographic outlines · simplified</text>
   </svg>;
 }
-export default function GeographyPreview() {
+export default function GeographyPreview({learnerId}:{learnerId?:string}) {
   const [step,setStep]=useState(-1);
   const [chosen,setChosen]=useState<string|null>(null);
   const [answers,setAnswers]=useState<boolean[]>([]);
+  const [details,setDetails]=useState<{correct:boolean;answer:string;expected:string;prompt:string}[]>([]);
+  const [saving,setSaving]=useState(false),[saveError,setSaveError]=useState(""),[stars,setStars]=useState(0);
   const [selected,setSelected]=useState("All");
   const finished=step>=questions.length;
   const q=questions[step];
-  function advance(){if(chosen===null)return;setAnswers(a=>[...a,chosen===q.answer]);setChosen(null);setStep(i=>i+1);}
+  async function advance(){if(chosen===null||saving)return;const next=[...details,{correct:chosen===q.answer,answer:chosen,expected:q.answer,prompt:q.prompt}];setDetails(next);setAnswers(a=>[...a,chosen===q.answer]);if(step===questions.length-1&&learnerId){setSaving(true);try{const result=await saveGeographyRound(learnerId,"geo-continents",next);setStars(result.starsEarned)}catch(e){setSaveError(e instanceof Error?e.message:"Save failed");setSaving(false);return}setSaving(false)}setChosen(null);setStep(i=>i+1);}
   return <main className="appShell learningApp" style={{paddingBottom:45}}>
-    <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:20,gap:10}}><Link href="/home" style={{color:"#705bd6",fontWeight:800}}>← Brightspark</Link><span style={{fontWeight:800,color:"#705bd6"}}>🌍 Geography · Lesson 2</span></div>
+    <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:20,gap:10}}><Link href={learnerId?`/learn/${learnerId}`:"/home"} style={{color:"#705bd6",fontWeight:800}}>← Brightspark</Link><span style={{fontWeight:800,color:"#705bd6"}}>🌍 Geography · Lesson 2</span></div>
     {step===-1?<section className="scienceLessonCard">
       <div className="scienceLessonBadge">🌍 Chapter 1 · Lesson 2</div><h1>Meet the continents</h1>
       <p className="scienceLessonIntro">A continent is a very large area of land. We learn seven continents. Europe and Asia share one enormous landmass called Eurasia. Let's explore!</p>
@@ -64,8 +67,8 @@ export default function GeographyPreview() {
         <h2 style={{fontSize:"1.25rem",marginBottom:10}}>{selected==="All"?"Our seven continents":selected}</h2>
         {selected==="All"?<p style={{margin:0}}>There are seven continents: Asia, Africa, North America, South America, Antarctica, Europe and Australia. Tap any continent to discover more!</p>:<div style={{display:"grid",gap:9}}>{continentFacts[selected]?.map((fact,i)=><p key={i} style={{margin:0,lineHeight:1.4}}>{fact}</p>)}<button onClick={()=>setSelected("All")} style={{justifySelf:"start",border:0,background:"transparent",padding:"5px 0",color:"#705bd6",fontWeight:800}}>← Show all continents</button></div>}
       </div>
-      <Link href="/geography-preview/directions" style={{display:"block",marginBottom:12,color:"#705bd6",fontWeight:800}}>← Lesson 1: Finding your way around Earth</Link><button className="primaryButton" style={{width:"100%",marginTop:18}} onClick={()=>setStep(0)}>Start the 7 questions →</button>
-    </section>:finished?<section className="scienceLessonCard" style={{textAlign:"center"}}><div style={{fontSize:54}}>🎉</div><h1>Great exploring!</h1><p>You got <strong>{answers.filter(Boolean).length} out of {questions.length}</strong> correct.</p><p className="muted">This is a lesson preview. No stars or progress have been saved yet.</p><button className="primaryButton" onClick={()=>{setStep(-1);setAnswers([]);setChosen(null)}}>Explore again</button></section>:
-    <><div style={{display:"flex",justifyContent:"space-between",fontWeight:800,marginBottom:12}}><span>Continents</span><span>{step+1}/{questions.length}</span></div><div style={{height:8,borderRadius:20,background:"#e8e4f2",marginBottom:20}}><div style={{height:"100%",width:`${(step+1)/questions.length*100}%`,borderRadius:20,background:"#705bd6"}}/></div><section className="questionCard" style={{padding:20,borderRadius:25}}><h2 style={{fontSize:"1.4rem",marginBottom:16}}>{q.prompt}</h2><div style={{background:"#f5f3fb",borderRadius:18,padding:8,marginBottom:18}}><WorldMap labels/></div><div style={{display:"grid",gridTemplateColumns:"repeat(2,minmax(0,1fr))",gap:10}}>{q.options.map(option=><button key={option} disabled={chosen!==null} onClick={()=>setChosen(option)} style={{padding:"17px 8px",minHeight:70,borderRadius:17,border:"2px solid "+(chosen!==null&&option===q.answer?"#55a76d":chosen===option?"#dd6b6b":"#e5e1ed"),background:chosen!==null&&option===q.answer?"#e2f5e6":chosen===option?"#fff0f0":"white",fontWeight:800,color:"#292638"}}>{option}</button>)}</div>{chosen!==null?<><p style={{marginTop:17,fontWeight:800,color:chosen===q.answer?"#287d48":"#a43c45"}}>{chosen===q.answer?"✓ That's right!":`Not quite. The answer is ${q.answer}.`}</p><p className="muted">{q.hint}</p><button className="primaryButton" style={{width:"100%"}} onClick={advance}>{step===questions.length-1?"Finish lesson":"Next question →"}</button></>:null}</section></>}
+      <Link href={learnerId?`/learn/${learnerId}/geography-directions`:"/geography-preview/directions"} style={{display:"block",marginBottom:12,color:"#705bd6",fontWeight:800}}>← Lesson 1: Finding your way around Earth</Link><button className="primaryButton" style={{width:"100%",marginTop:18}} onClick={()=>setStep(0)}>Start the 7 questions →</button>
+    </section>:finished?<section className="scienceLessonCard" style={{textAlign:"center"}}><div style={{fontSize:54}}>🎉</div><h1>Great exploring!</h1><p>You got <strong>{answers.filter(Boolean).length} out of {questions.length}</strong> correct.</p><p className="muted">{learnerId?`⭐ ${stars} stars earned this round`:"Sign in and choose a learner to save progress."}</p><button className="primaryButton" onClick={()=>{setStep(-1);setAnswers([]);setDetails([]);setSaveError("");setChosen(null)}}>Explore again</button></section>:
+    <><div style={{display:"flex",justifyContent:"space-between",fontWeight:800,marginBottom:12}}><span>Continents</span><span>{step+1}/{questions.length}</span></div><div style={{height:8,borderRadius:20,background:"#e8e4f2",marginBottom:20}}><div style={{height:"100%",width:`${(step+1)/questions.length*100}%`,borderRadius:20,background:"#705bd6"}}/></div><section className="questionCard" style={{padding:20,borderRadius:25}}><h2 style={{fontSize:"1.4rem",marginBottom:16}}>{q.prompt}</h2><div style={{background:"#f5f3fb",borderRadius:18,padding:8,marginBottom:18}}><WorldMap labels/></div><div style={{display:"grid",gridTemplateColumns:"repeat(2,minmax(0,1fr))",gap:10}}>{q.options.map(option=><button key={option} disabled={chosen!==null} onClick={()=>setChosen(option)} style={{padding:"17px 8px",minHeight:70,borderRadius:17,border:"2px solid "+(chosen!==null&&option===q.answer?"#55a76d":chosen===option?"#dd6b6b":"#e5e1ed"),background:chosen!==null&&option===q.answer?"#e2f5e6":chosen===option?"#fff0f0":"white",fontWeight:800,color:"#292638"}}>{option}</button>)}</div>{chosen!==null?<><p style={{marginTop:17,fontWeight:800,color:chosen===q.answer?"#287d48":"#a43c45"}}>{chosen===q.answer?"✓ That's right!":`Not quite. The answer is ${q.answer}.`}</p><p className="muted">{q.hint}</p><button className="primaryButton" style={{width:"100%"}} onClick={advance}>{saving?"Saving…":step===questions.length-1?"Finish lesson":"Next question →"}</button>{saveError?<p role="alert" style={{color:"#a43c45"}}>Could not save: {saveError}. Please try again.</p>:null}</>:null}</section></>}
   </main>;
 }
