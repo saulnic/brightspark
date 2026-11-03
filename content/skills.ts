@@ -1,12 +1,14 @@
 export type SkillMeta = {
   id: string;
-  subject: "maths" | "english" | "science";
+  subject: "maths" | "english" | "science" | "geography";
   name: string;
   icon: string;
   description: string;
 };
 
 export const SKILLS: SkillMeta[] = [
+  { id:"geo-directions",subject:"geography",name:"Finding your way around Earth",icon:"🧭",description:"Directions, poles and Equator" },
+  { id:"geo-continents",subject:"geography",name:"Meet the continents",icon:"🌎",description:"Explore seven continents" },
   { id: "numbers", subject: "maths", name: "Number sense", icon: "🔢", description: "Compare, order and understand numbers" },
   { id: "add", subject: "maths", name: "Add & subtract", icon: "➕", description: "Build quick, confident number facts" },
   { id: "times", subject: "maths", name: "Multiply & divide", icon: "✖️", description: "Groups, sharing and times tables" },
