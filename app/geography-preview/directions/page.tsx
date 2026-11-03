@@ -33,10 +33,10 @@ function Globe({focus}:{focus:string}){return <div style={{textAlign:"center"}}>
  <circle cx="170" cy="39" r={focus==="north"?9:6} fill="#6c4ed5"/>
  <circle cx="170" cy="271" r={focus==="south"?9:6} fill="#6c4ed5"/>
  <g fill="#25243a" fontSize="14" fontWeight="800" textAnchor="middle"><text x="170" y="21">North Pole ↑ N</text><text x="170" y="298">South Pole ↓ S</text><text x="170" y="150" fill="#9a431d">Equator</text></g>
- <g fontSize="16" fontWeight="900" fill="#3f3896"><text x="26" y="158">W</text><text x="300" y="158">E</text></g>
+ <g fontSize="16" fontWeight="900" fill="#3f3896"><text x="26" y="158" fontSize="12">West</text><text x="300" y="158" fontSize="12">East</text></g>
  </svg>
 
- <p className="muted" style={{fontSize:13,marginTop:12}}>This simple globe shows the poles and Equator. The land shapes are illustrations, not a detailed map.</p>
+ <p className="muted" style={{fontSize:13,marginTop:12}}>This simple globe shows the poles and Equator. The land shapes are simplified, not a detailed map.</p>
  </div>}
 export default function DirectionsLesson({learnerId}:{learnerId?:string}){const [step,setStep]=useState(0),[chosen,setChosen]=useState<string|null>(null),[answers,setAnswers]=useState<boolean[]>([]),[details,setDetails]=useState<{correct:boolean;answer:string;expected:string;prompt:string}[]>([]),[saving,setSaving]=useState(false),[saveError,setSaveError]=useState(""),[stars,setStars]=useState(0);const learning=step<lessons.length,quizIndex=step-lessons.length,done=quizIndex>=questions.length,q=questions[quizIndex];function reset(){setStep(0);setChosen(null);setAnswers([]);setDetails([]);setSaveError("")}
 return <main className="appShell learningApp" style={{paddingBottom:45}}><header style={{display:"flex",justifyContent:"space-between",gap:12,marginBottom:18}}><Link href={learnerId?`/learn/${learnerId}`:"/home"} style={{color:"#705bd6",fontWeight:800}}>← Brightspark</Link><span style={{fontWeight:800}}>🌍 Geography · Lesson 1</span></header>
