@@ -31,6 +31,11 @@ function conceptSignature(question: LearningQuestion) {
   // the same concept when the answer is hexagon, so suppress by answer.
   if (question.skillId === "shapes") return `shapes:${answer}`;
 
+  if (question.skillId === "fractions") {
+    const visual = question.visual as Record<string,unknown> | undefined;
+    if (visual?.kind === "fraction_bar") return `fraction:${visual.numerator}/${visual.denominator}`;
+    return `fraction:${answer}`;
+  }
   return `${question.objectiveId}:${answer}`;
 }
 
@@ -134,7 +139,7 @@ export function QuestionPlayer({
     const used = new Set(answers.map((answer) => conceptSignature(answer.question)));
     let candidate = generateQuestion(skillId, stage, seeds[index]);
 
-    for (let retry = 0; retry < 30 && used.has(conceptSignature(candidate)); retry++) {
+    for (let retry = 0; retry < 180 && used.has(conceptSignature(candidate)); retry++) {
       candidate = generateQuestion(skillId, stage, seeds[index] + (retry + 1) * 104729);
     }
 

@@ -45,8 +45,8 @@ export function QuestionVisual({ question }: { question: LearningQuestion }) {
     const green = Number(visual.green);
     return (
       <div className="visualStage objectPair">
-        <Jug colour="red" value={red} unit="mL" />
-        <Jug colour="green" value={green} unit="mL" />
+        <Jug colour="red" value={red} unit="mL" max={Math.max(red, green)} />
+        <Jug colour="green" value={green} unit="mL" max={Math.max(red, green)} />
       </div>
     );
   }
@@ -149,10 +149,11 @@ function ShapeIcon({ shape }: { shape: string }) {
   return <span className="shapeFallback">◆</span>;
 }
 
-function Jug({ colour, value, unit }: { colour: "red" | "green"; value: number; unit: string }) {
+function Jug({ colour, value, unit, max }: { colour: "red" | "green"; value: number; unit: string; max: number }) {
+  const scale = 0.65 + 0.35 * value / max;
   return (
     <div className="measureObject">
-      <svg className={`jugIcon ${colour}Jug`} viewBox="0 0 100 110" aria-hidden="true">
+      <svg className={`jugIcon ${colour}Jug`} viewBox="0 0 100 110" aria-hidden="true" style={{transform:`scale(${scale})`,transformOrigin:"center bottom"}}>
         <path d="M25 22 H67 Q82 22 82 38 V45 Q82 57 72 61 L67 90 Q65 101 54 101 H27 Q16 101 14 90 L8 40 Q6 25 25 22Z" />
         <path d="M67 33 Q93 32 91 52 Q90 69 70 69" fill="none" />
       </svg>

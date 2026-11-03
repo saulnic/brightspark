@@ -94,5 +94,25 @@ export function validateQuestion(
     }
   }
 
+  // Cross-check the illustrated quantities against the answer, not just choice formatting.
+  const visual = question.visual as Record<string, unknown> | undefined;
+  const actual = question.choices.find(c => c.id === question.correctChoiceId)?.value;
+  if (visual?.kind === "fraction_bar") {
+    const numerator = Number(visual.numerator), denominator = Number(visual.denominator);
+    if (!Number.isInteger(numerator) || !Number.isInteger(denominator) || denominator < 2 || numerator < 1 || numerator > denominator) {
+      errors.push("Fraction diagram must contain a valid number of shaded equal parts.");
+    }
+    if (String(actual) !== `${numerator}/${denominator}`) errors.push("Fraction answer must match the shaded diagram.");
+  }
+  if (visual?.kind === "ribbons" || visual?.kind === "jugs") {
+    const left = Number(visual.kind === "ribbons" ? visual.yellow : visual.red);
+    const right = Number(visual.kind === "ribbons" ? visual.blue : visual.green);
+    const leftName = visual.kind === "ribbons" ? "Yellow ribbon" : "Red jug";
+    const rightName = visual.kind === "ribbons" ? "Blue ribbon" : "Green jug";
+    const shorter = question.prompt.toLowerCase().includes("shorter");
+    const expected = left === right ? (visual.kind === "ribbons" ? "They are equal" : "They hold the same") : (shorter ? left < right : left > right) ? leftName : rightName;
+    if (!Number.isFinite(left) || !Number.isFinite(right) || left <= 0 || right <= 0) errors.push("Measurements must be positive numbers.");
+    if (actual !== expected) errors.push("Comparison answer must match the measurements.");
+  }
   return errors.length ? { valid: false, errors } : { valid: true };
 }

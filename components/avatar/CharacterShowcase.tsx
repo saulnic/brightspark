@@ -72,7 +72,7 @@ function Head({config}:{config:AvatarConfig}) {
     {config.eyewear==="glasses"?<><circle cx="85" cy="70" r="13" fill="none" stroke={COL[config.eyewearColour]} strokeWidth="3"/><circle cx="119" cy="70" r="13" fill="none" stroke={COL[config.eyewearColour]} strokeWidth="3"/><path d="M98 70 H106" stroke={COL[config.eyewearColour]} strokeWidth="3"/></>:null}
     {config.eyewear==="sunglasses"?<><rect x="70" y="61" width="29" height="19" rx="7" fill="#292731" stroke={COL[config.eyewearColour]} strokeWidth="4"/><rect x="105" y="61" width="29" height="19" rx="7" fill="#292731" stroke={COL[config.eyewearColour]} strokeWidth="4"/><path d="M99 67 H105" stroke={COL[config.eyewearColour]} strokeWidth="4"/></>:null}
 
-    {config.audioAccessory==="headphones"?<><path d="M67 65 Q69 31 102 25 Q136 31 138 65" fill="none" stroke={COL[config.audioColour]} strokeWidth="7" strokeLinecap="round"/><rect x="59" y="58" width="15" height="28" rx="7" fill={COL[config.audioColour]}/><rect x="131" y="58" width="15" height="28" rx="7" fill={COL[config.audioColour]}/></>:null}
+    {config.audioAccessory==="headphones"?<><path d="M67 79 Q63 35 102 25 Q141 35 137 79" fill="none" stroke={COL[config.audioColour]} strokeWidth="7" strokeLinecap="round"/><rect x="58" y="73" width="15" height="25" rx="7" fill={COL[config.audioColour]}/><rect x="131" y="73" width="15" height="25" rx="7" fill={COL[config.audioColour]}/></>:null}
   </>;
 }
 
