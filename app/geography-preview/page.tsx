@@ -3,15 +3,26 @@
 import { useState } from "react";
 import Link from "next/link";
 
+import { continentPaths } from "./continent-paths";
+
 const continents = [
-  {name:"North America",short:"North America",color:"#efb66b",x:108,y:90,shape:"M49 49 L84 31 L134 35 L160 53 L148 74 L121 81 L111 108 L94 119 L83 98 L65 86 Z"},
-  {name:"South America",short:"South America",color:"#e9a17f",x:142,y:170,shape:"M120 129 L150 116 L172 137 L165 169 L151 202 L140 231 L126 206 L132 177 L116 151 Z"},
-  {name:"Europe",short:"Europe",color:"#b2a0ec",x:275,y:76,shape:"M247 59 L263 45 L286 49 L295 67 L279 78 L260 73 Z"},
-  {name:"Africa",short:"Africa",color:"#f2d477",x:282,y:144,shape:"M246 94 L285 86 L316 105 L311 143 L291 185 L272 190 L258 156 L241 122 Z"},
-  {name:"Asia",short:"Asia",color:"#94c9b2",x:390,y:86,shape:"M291 47 L326 26 L382 28 L427 39 L472 56 L486 89 L453 108 L433 129 L400 117 L378 91 L346 86 L315 101 L297 79 Z"},
-  {name:"Australia",short:"Australia",color:"#89b7ec",x:428,y:189,shape:"M392 169 L419 156 L454 170 L467 193 L448 210 L411 207 L389 190 Z"},
-  {name:"Antarctica",short:"Antarctica",color:"#a9dce5",x:270,y:247,shape:"M77 250 L131 238 L194 247 L259 236 L329 244 L396 237 L463 250 L448 266 L104 266 Z"},
+  {name:"North America",color:"#efb66b",x:104,y:89},
+  {name:"South America",color:"#e9a17f",x:151,y:179},
+  {name:"Europe",color:"#b2a0ec",x:282,y:76},
+  {name:"Africa",color:"#f2d477",x:283,y:144},
+  {name:"Asia",color:"#94c9b2",x:382,y:82},
+  {name:"Australia",color:"#89b7ec",x:432,y:197},
+  {name:"Antarctica",color:"#a9dce5",x:267,y:260},
 ];
+const continentFacts:Record<string,string[]> = {
+  "North America":["North America includes Canada, the United States and Mexico.","It is north of South America, with the Pacific Ocean to the west.","It is home to the Rocky Mountains and the Great Lakes."],
+  "South America":["South America lies mostly south of the Equator.","The Amazon Rainforest and Amazon River are here.","The Andes mountains run along its western side."],
+  "Europe":["Europe is north of Africa and west of much of Asia.","Countries here include France, Italy and Spain.","Europe and Asia share one enormous landmass."],
+  "Africa":["Africa is the second-largest continent by land area.","The Sahara is the world's largest hot desert.","The Equator crosses the middle of Africa."],
+  "Asia":["Asia is the largest continent by land area.","Mount Everest, the highest mountain above sea level, is in Asia.","China, India and Japan are all in Asia."],
+  "Australia":["Australia is the smallest continent in the seven-continent model.","Australia is also a country, and Brisbane is one of its cities.","Nearby islands belong to the wider region called Oceania."],
+  "Antarctica":["Antarctica surrounds the South Pole.","A huge ice sheet covers most of the continent.","Penguins live along parts of its coast."],
+};
 const questions = [
   {prompt:"Which continent is covered by a huge ice sheet?",answer:"Antarctica",options:["Africa","Antarctica","Europe","Australia"],hint:"Look for the continent at the bottom of the map."},
   {prompt:"Which continent is home to the Sahara Desert?",answer:"Africa",options:["Asia","South America","Africa","Europe"],hint:"Find the large continent south of Europe."},
@@ -21,14 +32,17 @@ const questions = [
   {prompt:"Which continent includes Canada and Mexico?",answer:"North America",options:["North America","South America","Asia","Europe"],hint:"Look to the upper-left of the map."},
   {prompt:"Which continent is also the name of a country?",answer:"Australia",options:["Africa","Europe","Australia","Asia"],hint:"Find the continent southeast of Asia."},
 ];
-function WorldMap({highlight,labels=true}:{highlight?:string;labels?:boolean}) {
-  return <svg viewBox="0 0 520 286" role="img" aria-label="Simplified world map showing the seven continents" style={{width:"100%",height:"auto",display:"block"}}>
+function WorldMap({highlight,labels=true,onSelect}:{highlight?:string;labels?:boolean;onSelect?:(name:string)=>void}) {
+  return <svg viewBox="0 0 520 286" role="img" aria-label="World map showing seven continents. Tap a continent to learn about it." style={{width:"100%",height:"auto",display:"block",touchAction:"manipulation"}}>
     <rect width="520" height="286" rx="20" fill="#e7f4ff"/>
-    {[60,120,180,240].map(y=><line key={y} x1="0" x2="520" y1={y} y2={y} stroke="#c8e0f2" strokeDasharray="4 5"/>)}
-    {[100,200,300,400].map(x=><line key={x} y1="0" y2="286" x1={x} x2={x} stroke="#c8e0f2" strokeDasharray="4 5"/>)}
-    {continents.map(c=><path key={c.name} d={c.shape} fill={c.color} stroke={highlight===c.name?"#6b52cf":"#ffffff"} strokeWidth={highlight===c.name?5:2.5} opacity={highlight&&highlight!==c.name?.55:1}/>)}
-    {labels&&continents.map(c=><g key={c.name}><rect x={c.x-(c.name.length*3.2+8)} y={c.y-11} width={c.name.length*6.4+16} height="22" rx="10" fill="#fff" opacity=".92"/><text x={c.x} y={c.y+4} fontSize="11" fontWeight="800" textAnchor="middle" fill="#25243a">{c.short}</text></g>)}
-    <text x="508" y="281" textAnchor="end" fontSize="9" fill="#527c9a">Simplified learning map · not to scale</text>
+    {[60,120,180,240].map(y=><line key={y} x1="0" x2="520" y1={y} y2={y} stroke="#c8e0f2" strokeDasharray="4 5"/>) }
+    {[100,200,300,400].map(x=><line key={x} y1="0" y2="286" x1={x} x2={x} stroke="#c8e0f2" strokeDasharray="4 5"/>) }
+    {continents.map(c=><g key={c.name} onClick={onSelect?()=>onSelect(c.name):undefined} style={{cursor:onSelect?"pointer":"default"}} role={onSelect?"button":undefined} aria-label={onSelect?`Explore ${c.name}`:undefined} tabIndex={onSelect?0:undefined} onKeyDown={onSelect?(e)=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();onSelect(c.name)}}:undefined}>
+      {continentPaths[c.name]?.map((d,i)=><path key={i} d={d} fill={c.color} stroke={highlight===c.name?"#6b52cf":"#ffffff"} strokeWidth={highlight===c.name?1.8:.45} opacity={highlight&&highlight!==c.name?.45:1}/>)}
+      {labels?<g><rect x={c.x-(c.name.length*3.2+8)} y={c.y-12} width={c.name.length*6.4+16} height="24" rx="11" fill={highlight===c.name?"#6b52cf":"#fff"} opacity=".96"/><text x={c.x} y={c.y+4} fontSize="11" fontWeight="800" textAnchor="middle" fill={highlight===c.name?"#fff":"#25243a"}>{c.name}</text></g>:null}
+      {onSelect?<circle cx={c.x} cy={c.y} r="20" fill="transparent"/>:null}
+    </g>)}
+    <text x="508" y="282" textAnchor="end" fontSize="8" fill="#527c9a">Geographic outlines · simplified</text>
   </svg>;
 }
 export default function GeographyPreview() {
@@ -44,16 +58,11 @@ export default function GeographyPreview() {
     {step===-1?<section className="scienceLessonCard">
       <div className="scienceLessonBadge">🌍 Chapter 1 · Lesson 1</div><h1>Meet the continents</h1>
       <p className="scienceLessonIntro">Earth has seven continents. A continent is a very large area of land. Let's explore where they are!</p>
-      <div style={{background:"#f5f3fb",padding:10,borderRadius:20,margin:"18px 0"}}><WorldMap highlight={selected==="All"?undefined:selected}/></div>
-      <p style={{fontWeight:800,marginBottom:9}}>Tap a continent to explore it</p>
-      <div style={{display:"flex",flexWrap:"wrap",gap:8,marginBottom:20}}>{["All",...continents.map(c=>c.name)].map(name=><button key={name} onClick={()=>setSelected(name)} style={{border:"2px solid "+(selected===name?"#705bd6":"#e6e1f3"),background:selected===name?"#efeafd":"white",padding:"9px 12px",borderRadius:14,fontWeight:700,color:"#302b45"}}>{name}</button>)}</div>
-      <div className="scienceFacts">
-        <div className="scienceFact"><span>1</span><p><strong>Seven continents:</strong> Asia, Africa, North America, South America, Antarctica, Europe and Australia.</p></div>
-        <div className="scienceFact"><span>2</span><p><strong>Asia</strong> is the largest continent. <strong>Australia</strong> is the smallest of the seven.</p></div>
-        <div className="scienceFact"><span>3</span><p><strong>North America</strong> is above <strong>South America</strong> on most world maps.</p></div>
-        <div className="scienceFact"><span>4</span><p><strong>Europe</strong> lies north of <strong>Africa</strong>. The Sahara Desert is in Africa.</p></div>
-        <div className="scienceFact"><span>5</span><p><strong>Antarctica</strong> surrounds the South Pole and is covered by a vast ice sheet.</p></div>
-        <div className="scienceFact"><span>6</span><p><strong>Australia</strong> is both a country and a continent. In some geography lessons, the wider region is called Oceania.</p></div>
+      <p style={{fontWeight:800,marginBottom:10}}>Tap a continent on the map to explore it</p>
+      <div style={{background:"#f5f3fb",padding:8,borderRadius:20,margin:"12px 0"}}><WorldMap highlight={selected==="All"?undefined:selected} onSelect={setSelected}/></div>
+      <div aria-live="polite" style={{background:"#f5f3fb",padding:16,borderRadius:18,marginBottom:20,minHeight:142}}>
+        <h2 style={{fontSize:"1.25rem",marginBottom:10}}>{selected==="All"?"Our seven continents":selected}</h2>
+        {selected==="All"?<p style={{margin:0}}>There are seven continents: Asia, Africa, North America, South America, Antarctica, Europe and Australia. Tap any continent to discover more!</p>:<div style={{display:"grid",gap:9}}>{continentFacts[selected]?.map((fact,i)=><p key={i} style={{margin:0,lineHeight:1.4}}>{fact}</p>)}<button onClick={()=>setSelected("All")} style={{justifySelf:"start",border:0,background:"transparent",padding:"5px 0",color:"#705bd6",fontWeight:800}}>← Show all continents</button></div>}
       </div>
       <button className="primaryButton" style={{width:"100%",marginTop:18}} onClick={()=>setStep(0)}>Start the 7 questions →</button>
     </section>:finished?<section className="scienceLessonCard" style={{textAlign:"center"}}><div style={{fontSize:54}}>🎉</div><h1>Great exploring!</h1><p>You got <strong>{answers.filter(Boolean).length} out of {questions.length}</strong> correct.</p><p className="muted">This is a lesson preview. No stars or progress have been saved yet.</p><button className="primaryButton" onClick={()=>{setStep(-1);setAnswers([]);setChosen(null)}}>Explore again</button></section>:
