@@ -15,13 +15,13 @@ const continents = [
   {name:"Antarctica",color:"#a9dce5",x:267,y:260},
 ];
 const continentFacts:Record<string,string[]> = {
-  "North America":["North America includes Canada, the United States and Mexico.","It is north of South America, with the Pacific Ocean to the west.","It is home to the Rocky Mountains and the Great Lakes."],
+  "North America":["North America includes Canada, the United States and Mexico.","The Pacific Ocean is to its west and the Atlantic Ocean is to its east.","It is home to the Rocky Mountains and the Great Lakes."],
   "South America":["South America lies mostly south of the Equator.","The Amazon Rainforest and Amazon River are here.","The Andes mountains run along its western side."],
-  "Europe":["Europe is north of Africa and west of much of Asia.","Countries here include France, Italy and Spain.","Europe and Asia share one enormous landmass."],
+  "Europe":["Europe is north of Africa and west of much of Asia.","Europe has many countries, including France, Italy and Spain.","Europe and Asia share one enormous landmass."],
   "Africa":["Africa is the second-largest continent by land area.","The Sahara is the world's largest hot desert.","The Equator crosses the middle of Africa."],
-  "Asia":["Asia is the largest continent by land area.","Mount Everest, the highest mountain above sea level, is in Asia.","China, India and Japan are all in Asia."],
-  "Australia":["Australia is the smallest continent in the seven-continent model.","Australia is also a country, and Brisbane is one of its cities.","Nearby islands belong to the wider region called Oceania."],
-  "Antarctica":["Antarctica surrounds the South Pole.","A huge ice sheet covers most of the continent.","Penguins live along parts of its coast."],
+  "Asia":["Asia is the largest continent by land area.","Mount Everest, the highest mountain above sea level, is in Asia.","Asia has many countries, including China, India and Japan."],
+  "Australia":["Australia is the smallest continent in the seven-continent model.","Australia is also a country, and Brisbane is one of its cities.","Oceania includes Australia, New Zealand and many Pacific islands."],
+  "Antarctica":["Antarctica surrounds the South Pole.","A huge ice sheet covers most of the continent.","Penguins and seals live along its coasts; whales and seabirds visit nearby seas."],
 };
 const questions = [
   {prompt:"Which continent is covered by a huge ice sheet?",answer:"Antarctica",options:["Africa","Antarctica","Europe","Australia"],hint:"Look for the continent at the bottom of the map."},
@@ -54,17 +54,17 @@ export default function GeographyPreview() {
   const q=questions[step];
   function advance(){if(chosen===null)return;setAnswers(a=>[...a,chosen===q.answer]);setChosen(null);setStep(i=>i+1);}
   return <main className="appShell learningApp" style={{paddingBottom:45}}>
-    <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:20,gap:10}}><Link href="/home" style={{color:"#705bd6",fontWeight:800}}>← Brightspark</Link><span style={{fontWeight:800,color:"#705bd6"}}>🌍 Geography · Preview</span></div>
+    <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:20,gap:10}}><Link href="/home" style={{color:"#705bd6",fontWeight:800}}>← Brightspark</Link><span style={{fontWeight:800,color:"#705bd6"}}>🌍 Geography · Lesson 2</span></div>
     {step===-1?<section className="scienceLessonCard">
-      <div className="scienceLessonBadge">🌍 Chapter 1 · Lesson 1</div><h1>Meet the continents</h1>
-      <p className="scienceLessonIntro">Earth has seven continents. A continent is a very large area of land. Let's explore where they are!</p>
+      <div className="scienceLessonBadge">🌍 Chapter 1 · Lesson 2</div><h1>Meet the continents</h1>
+      <p className="scienceLessonIntro">A continent is a very large area of land. We learn seven continents. Europe and Asia share one enormous landmass called Eurasia. Let's explore!</p>
       <p style={{fontWeight:800,marginBottom:10}}>Tap a continent on the map to explore it</p>
       <div style={{background:"#f5f3fb",padding:8,borderRadius:20,margin:"12px 0"}}><WorldMap highlight={selected==="All"?undefined:selected} onSelect={setSelected}/></div>
       <div aria-live="polite" style={{background:"#f5f3fb",padding:16,borderRadius:18,marginBottom:20,minHeight:142}}>
         <h2 style={{fontSize:"1.25rem",marginBottom:10}}>{selected==="All"?"Our seven continents":selected}</h2>
         {selected==="All"?<p style={{margin:0}}>There are seven continents: Asia, Africa, North America, South America, Antarctica, Europe and Australia. Tap any continent to discover more!</p>:<div style={{display:"grid",gap:9}}>{continentFacts[selected]?.map((fact,i)=><p key={i} style={{margin:0,lineHeight:1.4}}>{fact}</p>)}<button onClick={()=>setSelected("All")} style={{justifySelf:"start",border:0,background:"transparent",padding:"5px 0",color:"#705bd6",fontWeight:800}}>← Show all continents</button></div>}
       </div>
-      <button className="primaryButton" style={{width:"100%",marginTop:18}} onClick={()=>setStep(0)}>Start the 7 questions →</button>
+      <Link href="/geography-preview/directions" style={{display:"block",marginBottom:12,color:"#705bd6",fontWeight:800}}>← Lesson 1: Finding your way around Earth</Link><button className="primaryButton" style={{width:"100%",marginTop:18}} onClick={()=>setStep(0)}>Start the 7 questions →</button>
     </section>:finished?<section className="scienceLessonCard" style={{textAlign:"center"}}><div style={{fontSize:54}}>🎉</div><h1>Great exploring!</h1><p>You got <strong>{answers.filter(Boolean).length} out of {questions.length}</strong> correct.</p><p className="muted">This is a lesson preview. No stars or progress have been saved yet.</p><button className="primaryButton" onClick={()=>{setStep(-1);setAnswers([]);setChosen(null)}}>Explore again</button></section>:
     <><div style={{display:"flex",justifyContent:"space-between",fontWeight:800,marginBottom:12}}><span>Continents</span><span>{step+1}/{questions.length}</span></div><div style={{height:8,borderRadius:20,background:"#e8e4f2",marginBottom:20}}><div style={{height:"100%",width:`${(step+1)/questions.length*100}%`,borderRadius:20,background:"#705bd6"}}/></div><section className="questionCard" style={{padding:20,borderRadius:25}}><h2 style={{fontSize:"1.4rem",marginBottom:16}}>{q.prompt}</h2><div style={{background:"#f5f3fb",borderRadius:18,padding:8,marginBottom:18}}><WorldMap labels/></div><div style={{display:"grid",gridTemplateColumns:"repeat(2,minmax(0,1fr))",gap:10}}>{q.options.map(option=><button key={option} disabled={chosen!==null} onClick={()=>setChosen(option)} style={{padding:"17px 8px",minHeight:70,borderRadius:17,border:"2px solid "+(chosen!==null&&option===q.answer?"#55a76d":chosen===option?"#dd6b6b":"#e5e1ed"),background:chosen!==null&&option===q.answer?"#e2f5e6":chosen===option?"#fff0f0":"white",fontWeight:800,color:"#292638"}}>{option}</button>)}</div>{chosen!==null?<><p style={{marginTop:17,fontWeight:800,color:chosen===q.answer?"#287d48":"#a43c45"}}>{chosen===q.answer?"✓ That's right!":`Not quite. The answer is ${q.answer}.`}</p><p className="muted">{q.hint}</p><button className="primaryButton" style={{width:"100%"}} onClick={advance}>{step===questions.length-1?"Finish lesson":"Next question →"}</button></>:null}</section></>}
   </main>;
