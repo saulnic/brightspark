@@ -1,3 +1,4 @@
+import {GEOGRAPHY_UNITS} from "./geography-curriculum";
 export type SkillMeta = {
   id: string;
   subject: "maths" | "english" | "science" | "geography";
@@ -7,6 +8,7 @@ export type SkillMeta = {
 };
 
 export const SKILLS: SkillMeta[] = [
+  ...GEOGRAPHY_UNITS.map(unit=>({id:unit.id,subject:"geography" as const,name:unit.title,icon:unit.icon,description:unit.chapter})),
   { id:"geo-directions",subject:"geography",name:"Finding your way around Earth",icon:"🧭",description:"Directions, poles and Equator" },
   { id:"geo-continents",subject:"geography",name:"Meet the continents",icon:"🌎",description:"Explore seven continents" },
   { id: "numbers", subject: "maths", name: "Number sense", icon: "🔢", description: "Compare, order and understand numbers" },
