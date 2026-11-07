@@ -115,7 +115,8 @@ export const GEOGRAPHY_UNITS:GeographyUnit[]=[
       "A blue line often shows a river.",
       "A dotted line can show a walking track.",
       "A scale bar represents real distance.",
-      "Always check the map key: symbols can vary."
+      "Always check the map key: symbols can vary.",
+      "North arrow — Shows north."
     ],
     "pairs": [
       {
@@ -150,7 +151,8 @@ export const GEOGRAPHY_UNITS:GeographyUnit[]=[
       "The Indian Ocean is to Australia's west.",
       "The Pacific Ocean is to Australia's east.",
       "Australia is both a country and a continent.",
-      "Canberra is Australia's capital city."
+      "Canberra is Australia's capital city.",
+      "Southern Hemisphere — Australia's hemisphere."
     ],
     "pairs": [
       {
@@ -185,7 +187,8 @@ export const GEOGRAPHY_UNITS:GeographyUnit[]=[
       "Queensland is in the northeast.",
       "Western Australia is the largest state by area.",
       "Tasmania is an island state.",
-      "New South Wales is south of Queensland."
+      "New South Wales is south of Queensland.",
+      "Victoria — South of New South Wales."
     ],
     "pairs": [
       {
@@ -885,7 +888,8 @@ export const GEOGRAPHY_UNITS:GeographyUnit[]=[
       "The Equator is zero degrees latitude.",
       "The North Pole is 90 degrees north.",
       "The South Pole is 90 degrees south.",
-      "Lines of latitude run around Earth from east to west."
+      "Lines of latitude run around Earth from east to west.",
+      "Latitude lines — Run east-west."
     ],
     "pairs": [
       {
@@ -955,7 +959,8 @@ export const GEOGRAPHY_UNITS:GeographyUnit[]=[
       "The Prime Meridian is zero degrees longitude.",
       "Earth turns once in about 24 hours.",
       "Different places experience noon at different times.",
-      "Time zones help communities agree on local clock times."
+      "Time zones help communities agree on local clock times.",
+      "Latitude — North-south position."
     ],
     "pairs": [
       {
@@ -1060,12 +1065,11 @@ export const GEOGRAPHY_UNITS:GeographyUnit[]=[
       "The Colosseum is in Rome, Italy.",
       "The Statue of Liberty is in New York, United States.",
       "Angkor Wat is in Cambodia.",
-      "Petra is in Jordan."
+      "Petra is in Jordan.",
+      "Acropolis — Greece.",
+      "The Acropolis is an ancient landmark in Athens, Greece."
     ],
     "pairs": [
-      {
-        "answer": "The Acropolis is in Athens, Greece."
-      },
       {
         "answer": "Colosseum",
         "clue": "Italy"
@@ -1098,7 +1102,9 @@ export const GEOGRAPHY_UNITS:GeographyUnit[]=[
       "Every flat world map changes some shapes, sizes or distances.",
       "Mercator maps stretch areas near the poles.",
       "Africa is about fourteen times larger than Greenland.",
-      "Equal Earth maps show relative areas more accurately."
+      "Equal Earth maps show relative areas more accurately.",
+      "Globe — Round model.",
+      "Projection — Way to flatten Earth."
     ],
     "pairs": [
       {
