@@ -179,72 +179,52 @@ export const GEOGRAPHY_UNITS:GeographyUnit[]=[
   },
   {
     "id": "geo-states",
-    "title": "Australian states",
+    "title": "Australian states and capitals",
     "icon": "🦘",
     "chapter": "Australia",
     "facts": [
       "Australia has six states and two mainland territories.",
-      "Queensland is in the northeast.",
-      "Western Australia is the largest state by area.",
-      "Tasmania is an island state.",
-      "New South Wales is south of Queensland.",
-      "Victoria — South of New South Wales."
+      "Perth is the capital of Western Australia.",
+      "Darwin is the capital of Northern Territory.",
+      "Adelaide is the capital of South Australia.",
+      "Brisbane is the capital of Queensland.",
+      "Sydney is the capital of New South Wales.",
+      "Melbourne is the capital of Victoria.",
+      "Hobart is the capital of Tasmania.",
+      "Canberra is the capital of Australian Capital Territory."
     ],
     "pairs": [
       {
-        "answer": "Queensland",
-        "clue": "Northeast state"
+        "answer": "Perth",
+        "clue": "Capital of Western Australia"
       },
       {
-        "answer": "Western Australia",
-        "clue": "Largest state"
+        "answer": "Darwin",
+        "clue": "Capital of Northern Territory"
       },
       {
-        "answer": "Tasmania",
-        "clue": "Island state"
+        "answer": "Adelaide",
+        "clue": "Capital of South Australia"
       },
-      {
-        "answer": "New South Wales",
-        "clue": "South of Queensland"
-      },
-      {
-        "answer": "Victoria",
-        "clue": "South of New South Wales"
-      }
-    ]
-  },
-  {
-    "id": "geo-capitals",
-    "title": "Australian capital cities",
-    "icon": "🏙️",
-    "chapter": "Australia",
-    "facts": [
-      "Brisbane is Queensland's capital.",
-      "Sydney is New South Wales's capital.",
-      "Melbourne is Victoria's capital.",
-      "Perth is Western Australia's capital.",
-      "Hobart is Tasmania's capital."
-    ],
-    "pairs": [
       {
         "answer": "Brisbane",
-        "clue": "Queensland"
+        "clue": "Capital of Queensland"
       },
       {
         "answer": "Sydney",
-        "clue": "New South Wales"
+        "clue": "Capital of New South Wales"
       },
       {
         "answer": "Melbourne",
-        "clue": "Victoria"
-      },
-      {
-        "answer": "Perth",
-        "clue": "Western Australia"
+        "clue": "Capital of Victoria"
       },
       {
         "answer": "Hobart",
-        "clue": "Tasmania"
+        "clue": "Capital of Tasmania"
+      },
+      {
+        "answer": "Canberra",
+        "clue": "Capital of Australian Capital Territory"
       }
     ]
   },
